@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cervical Cancer Prediction System" />
+    <meta name="keywords" content="Cervical Cancer, Prediction, Healthcare" />
+    <meta name="author" content="Health System Team" />
+    <link
+      icons
+      rel="icon"
+      href="{{url_for('static', filename='hospital-healthcare-and-medical-svgrepo-com.svg')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/fontawesome.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/brands.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/solid.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}"
+    />
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}" />
+
+    <title>Reports</title>
+    <style>
+      .container {
+        overflow: hidden;
+      }
+      /* about page */
+      #about-content {
+        overflow-y: scroll;
+        background-color: #f1f1f1;
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: fixed;
+        backdrop-filter: blur(1px);
+        height: 100vh;
+      }
+
+      .overview-container {
+        padding: 0rem 0.1rem;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .section {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+
+      .section:hover {
+        transform: translateY(-5px);
+        box-shadow: none;
+      }
+
+      .hero-section {
+        text-align: center;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /*background-color: dodgerblue;*/
+        color: white;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+      }
+
+      .hero-title {
+        font-size: clamp(1.5rem, 2, 5vw, 2rem);
+        margin-bottom: 1rem;
+        font-weight: bold;
+      }
+
+      .hero-subtitle {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        color: white;
+        opacity: 0.9;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .feature-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .feature-icon {
+        font-size: 2rem;
+        /* color: #2ecc71; */
+        color: #111e88;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: #596671;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+      }
+
+      .tech-stack {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .tech-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      @media (max-width: 768px) {
+        #about-content {
+          margin-top: 2.3rem;
+          width: 100%;
+        }
+        .hero-section {
+          margin-top: 0.1em;
+        }
+        .overview-container {
+          padding: 0.2rem 0.1rem;
+          margin: 0.5rem 0.1rem;
+        }
+
+        .section {
+          padding: 1.2rem;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- sidebar content -->
+      <aside>
+        <div class="top">
+          <a href="{{url_for('main.home')}}"
+            ><div class="logo">
+              <img
+                src="{{url_for('static', filename='CervixVision.png')}}"
+                alt="icon"
+              />
+              <h2 class="head">CervixVision</h2>
+            </div></a
+          >
+          <div class="close-btn">
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+        </div>
+        <div class="sidebar">
+          {% if current_user.is_authenticated %} {% if current_user.role in
+          ['admin', 'super admin', 'doctor']%}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          {%if current_user.role in ['admin', 'super admin']%}
+          <a href="{{url_for('user_management.admin')}}">
+            <i class="fas fa-user-shield"></i>
+            <h3>Admin</h3>
+          </a>
+          {%endif%}
+
+          <a href="{{url_for('main.dashboard')}}">
+            <i class="fas fa-tachometer-alt"></i>
+            <h3>Dashboard</h3>
+          </a>
+          {% if current_user.role == "doctor" %}
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+          {%endif%}
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>Results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          {% if current_user.role in ['admin', 'super admin'] %}
+          <a href="{{url_for('main.reports')}}">
+            <i class="fas fa-file-alt"></i>
+            <h3>Reports</h3>
+          </a>
+          {% endif %}
+          <!--<a href="#">
+                    <i class="fas fa-question-circle"></i>
+                    <h3>Help</h3>
+                  </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% else %}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          <!--<a href="#">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Help</h3>
+                      </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% endif %} {% else %}
+          <a href="{{url_for('auth.login')}}"> Login </a>
+          {% endif %}
+        </div>
+      </aside>
+
+      <!-- right section content -->
+      <div class="right">
+        <div class="top">
+          <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+          </div>
+          <!--user profile photo-->
+          <div class="profile">
+            <div class="profile-info">
+              <h2>Hello, <b>{{current_user.f_name | capitalize}}</b></h2>
+            </div>
+            <div class="profile-pic">
+              <a href="{{ url_for('auth.user_profile') }}">
+                <!--<img
+                  src="{{ url_for('static', filename='profile_pictures/' + current_user.profile_pic) if current_user.profile_pic else url_for('static', filename='profile_pictures/default-premium.png') }}"
+                  alt="Profile Picture"
+                />-->
+                <img
+                  src="{{url_for('static', filename='/profile_pictures/user.png')}}"
+                  alt="pic"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- section for reports page content -->
+        <div class="container-fluid mt-4 mb-5 w-100 p-2">
+          <!-- Filter Controls -->
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <label>Start Date</label>
+              <input type="date" id="start-date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+              <label>End Date</label>
+              <input type="date" id="end-date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+              <label>Filter Type</label>
+              <select id="filter-type" class="form-select">
+                <option value="">Custom</option>
+                <option value="daily">Today</option>
+                <option value="weekly">This Week</option>
+                <option value="monthly">This Month</option>
+              </select>
+            </div>
+            <div class="col-md-3 d-grid">
+              <button class="btn btn-primary mt-4" onclick="loadSummary()">
+                Apply Filter
+              </button>
+            </div>
+          </div>
+          <!-- Export Buttons -->
+          <!-- <div class="mb-3 d-flex justify-content-end gap-2">
+            <button class="btn btn-outline-success" onclick="exportCSV()">
+              Export CSV
+            </button>
+            <button class="btn btn-outline-danger" onclick="exportPDF()">
+              Export PDF
+            </button>
+          </div> -->
+          <!-- Summary Report Table -->
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+              <h5 class="mb-0">Summary Report</h5>
+            </div>
+            <div class="card-body">
+              <table class="table table-bordered mb-0">
+                <tbody id="summary-report">
+                  <tr>
+                    <th>Total Predictions</th>
+                    <td id="total-predictions">-</td>
+                  </tr>
+                  <tr>
+                    <th>Average Confidence</th>
+                    <td id="avg-confidence">-</td>
+                  </tr>
+                  <tr>
+                    <th>Rejected Predictions (OOD)</th>
+                    <td id="rejected-count">-</td>
+                  </tr>
+                  <tr>
+                    <th>Predictions by Class</th>
+                    <td id="class-distribution">-</td>
+                  </tr>
+                  <tr>
+                    <th>Most Frequent Class</th>
+                    <td id="top-class">-</td>
+                  </tr>
+                  <tr>
+                    <th>Most Recent Upload</th>
+                    <td id="last-upload">-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- Footer section -->
+        <div>
+          <footer
+            class="text-center"
+            style="position: absolute; bottom: -10px; width: 100%"
+          >
+            <p class="text-muted">
+              &copy; 2025 CervixVision. All rights reserved.
+            </p>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function getDateRangeFromFilter() {
+        const type = document.getElementById("filter-type").value;
+        const today = new Date();
+        let start = "",
+          end = "";
+
+        if (type === "daily") {
+          const d = today.toISOString().split("T")[0];
+          start = end = d;
+        } else if (type === "weekly") {
+          const day = today.getDay();
+          const diffToMonday = today.getDate() - day + (day === 0 ? -6 : 1);
+          const monday = new Date(today.setDate(diffToMonday));
+          const sunday = new Date(monday);
+          sunday.setDate(monday.getDate() + 6);
+          start = monday.toISOString().split("T")[0];
+          end = sunday.toISOString().split("T")[0];
+        } else if (type === "monthly") {
+          const first = new Date(today.getFullYear(), today.getMonth(), 1);
+          const last = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+          start = first.toISOString().split("T")[0];
+          end = last.toISOString().split("T")[0];
+        } else {
+          start = document.getElementById("start-date").value;
+          end = document.getElementById("end-date").value;
+        }
+
+        return { start, end };
+      }
+
+      function getExportQueryParams() {
+        const { start, end } = getDateRangeFromFilter();
+        const params = new URLSearchParams();
+        if (start) params.append("start", start);
+        if (end) params.append("end", end);
+        return params.toString();
+      }
+
+      function loadSummary() {
+        const { start, end } = getDateRangeFromFilter();
+
+        fetch(`/api/report/summary?start=${start}&end=${end}`)
+          .then((res) => res.json())
+          .then((summary) => {
+            document.getElementById("total-predictions").textContent =
+              summary.total_predictions;
+            document.getElementById("avg-confidence").textContent = `${(
+              summary.avg_confidence * 100
+            ).toFixed(2)}%`; // Convert to percentage
+            document.getElementById("rejected-count").textContent =
+              summary.rejected_count;
+            document.getElementById("class-distribution").textContent =
+              summary.class_distribution
+                .map((c) => `${c.class}: ${c.count}`)
+                .join(", ");
+            document.getElementById("top-class").textContent =
+              summary.top_class;
+            document.getElementById("last-upload").textContent =
+              summary.last_upload;
+          });
+      }
+
+      document.addEventListener("DOMContentLoaded", loadSummary);
+    </script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+  </body>
+</html>

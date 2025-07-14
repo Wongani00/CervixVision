@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cervical Cancer Prediction System" />
+    <meta name="keywords" content="Cervical Cancer, Prediction, Healthcare" />
+    <meta name="author" content="Health System Team" />
+    <link
+      icons
+      rel="icon"
+      href="{{url_for('static', filename='hospital-healthcare-and-medical-svgrepo-com.svg')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/fontawesome.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/brands.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/solid.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='admin_panel.css')}}"
+    />
+    <style>
+      /* Metrics Card */
+      .metric-card {
+        border-radius: 0.75rem;
+        transition: transform 0.3s ease;
+        min-height: 120px;
+        background-color: #ffffff;
+        padding: 1rem;
+      }
+
+      .metric-card:hover {
+        transform: translateY(-3px) !important;
+        
+      }
+
+      /* Analytics Card */
+      .analytics {
+        margin-top: 2rem;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .analytics-card {
+        background-color: #ffffff;
+        border-radius: 0.75rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        padding: 1.5rem;
+      }
+
+      .analytics-card h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+
+      .predictions-graph {
+        width: 100%;
+        height: 300px;
+        background-color: #f8f9fa;
+        border-radius: 0.5rem;
+      }
+
+      /* ==== Search and Add User Section ====*/
+      .user-management-header {
+          padding: 0.5rem 0;
+      }
+      
+      .search-container {
+          position: relative;
+          flex-grow: 1;
+          min-width: 60vw;
+          transition: all 0.3s ease;
+      }
+      
+      #user-search {
+          border-radius: 50px;
+          padding-left: 2.5rem;
+          border: 1px solid #e0e0e0;
+          transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+          height: 46px;
+          background-color: white;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      }
+      
+      #user-search:focus {
+          border-color: #4361ee;
+          box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+          background-color: white;
+          outline: none;
+      }
+      
+      .btn-add-user {
+          border-radius: 50px;
+          height: 46px;
+          padding: 0.5rem 1.25rem;
+          font-weight: 500;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          background-color: #4361ee;
+          border: none;
+          box-shadow: 0 2px 5px rgba(67, 97, 238, 0.2);
+          transition: all 0.3s ease;
+      }
+      
+      .btn-add-user:hover {
+          background-color: #3a56d4;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(67, 97, 238, 0.25);
+      }
+      
+      .btn-add-user:active {
+          transform: translateY(0);
+      }
+      
+      .clear-search {
+          color: #6c757d;
+          padding: 0;
+          font-size: 0.8rem;
+          opacity: 0.7;
+          transition: opacity 0.2s ease;
+      }
+      
+      .clear-search:hover {
+          opacity: 1;
+          color: #4361ee;
+      }
+      
+      /* Responsive Adjustments */
+      @media (max-width: 576px) {
+          .user-management-header {
+              padding: 0.5rem 0.5rem;
+          }
+          
+          #user-search {
+              padding-left: 2rem;
+              font-size: 0.9rem;
+          }
+          
+          .btn-add-user {
+              width: 46px;
+              padding: 0;
+              border-radius: 50%;
+          }
+          
+          .search-container i {
+              font-size: 0.9rem;
+              margin-left: 0.5rem;
+          }
+      }
+
+      /* ==== Pagination Styles ==== */
+    .pagination {
+        margin-top: 15px;
+    }
+    .page-item.active .page-link {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    /* Enhanced Pagination Styles */
+    .page-link {
+        padding: 0.5rem 0.75rem;
+        margin: 0 2px;
+        min-width: 40px;
+        text-align: center;
+    }
+    .page-item:first-child .page-link,
+    .page-item:last-child .page-link {
+        min-width: 80px; /* Wider buttons for Previous/Next */
+    }
+    </style>
+    <title>Admin Panel</title>
+  </head>
+  <body class="dark-mode">
+    <div class="container">
+      <!-- sidebar content -->
+      <aside>
+        <div class="top">
+          <a href="{{url_for('main.home')}}"
+            ><div class="logo">
+              <img
+                src="{{url_for('static', filename='CervixVision.png')}}"
+                alt="icon"
+              />
+              <h2 class="head">CervixVision</h2>
+            </div></a
+          >
+          <div class="close-btn">
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+        </div>
+        <div class="sidebar">
+          {% if current_user.is_authenticated %} {% if current_user.role in
+          ['admin', 'super admin', 'doctor']%}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          {%if current_user.role in ['admin', 'super admin']%}
+          <a href="{{url_for('user_management.admin')}}">
+            <i class="fas fa-user-shield"></i>
+            <h3>Admin</h3>
+          </a>
+          {%endif%}
+
+          <a href="{{url_for('main.dashboard')}}">
+            <i class="fas fa-tachometer-alt"></i>
+            <h3>Dashboard</h3>
+          </a>
+          {% if current_user.role == "doctor" %}
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+          {%endif%}
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>Results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          {% if current_user.role in ['admin', 'super admin'] %}
+          <a href="{{url_for('main.reports')}}">
+            <i class="fas fa-file-alt"></i>
+            <h3>Reports</h3>
+          </a>
+          {% endif %}
+          <!--<a href="#">
+                    <i class="fas fa-question-circle"></i>
+                    <h3>Help</h3>
+                  </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% else %}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          <!--<a href="#">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Help</h3>
+                      </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% endif %} {% else %}
+          <a href="{{url_for('auth.login')}}"> Login </a>
+          {% endif %}
+        </div>
+      </aside>
+
+      <!-- main section area -->
+      <main>
+        <div class="right">
+          <div class="top">
+            <div class="menu-btn">
+              <i class="fas fa-bars"></i>
+            </div>
+            <!-- <div class="theme-toggler">
+                      <i class="fas fa-sun"></i>
+                      <i class="fas fa-moon"></i>
+                  </div> -->
+            <!--user profile photo-->
+            <div class="profile">
+              <div class="profile-info">
+                <h2>Hello, <b>{{current_user.f_name | capitalize}}</b></h2>
+              </div>
+              <div class="profile-pic">
+                <a href="{{ url_for('auth.user_profile') }}">
+                  <!--<img
+                    src="{{ url_for('static', filename='profile_pictures/' + current_user.profile_pic) if current_user.profile_pic else url_for('static', filename='profile_pictures/default-premium.png') }}"
+                    alt="Profile Picture"
+                  />-->
+                  <img
+                  src="{{url_for('static', filename='/profile_pictures/user.png')}}"
+                  alt="pic"
+                />
+                </a>
+              </div>
+            </div>
+          </div>
+        
+        <!--<div class="search-field">
+          <input type="text" placeholder="search user" />
+          <i class="fa fa-search"></i>
+        </div>-->
+        <div class="row g-4 mb-4 metrics-cards">
+          <!-- Total Doctors -->
+          <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+            <div class="card metric-card shadow-sm border-0">
+              <div
+                class="card-body d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <p class="text-muted mb-1">Total Doctors/Nurses</p>
+                  <h4 class="fw-bold mb-0">{{ stats.doctor_nurse_count }}</h4>
+                  <small>{{ stats.doctor_count }} doctor(s), {{ stats.nurse_count }} nurse(s)</small>
+                </div>
+                <div class="icon-circle bg-primary-subtle text-primary">
+                  <i class="fas fa-user-md fa-lg"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Admins -->
+          <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+            <div class="card metric-card shadow-sm border-0">
+              <div
+                class="card-body d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <p class="text-muted mb-1">Total Admins</p>
+                  <h4 class="fw-bold mb-0">{{ stats.admin_superadmin_count }}</h4>
+                </div>
+                <div class="icon-circle bg-success-subtle text-warning">
+                  <i class="fas fa-user-shield fa-lg"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Model Accuracy -->
+          <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+            <div class="card metric-card shadow-sm border-0">
+              <div
+                class="card-body d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <p class="text-muted mb-1">Model Accuracy</p>
+                  <h4 class="fw-bold mb-0">99%</h4>
+                </div>
+                <div class="icon-circle bg-purple-subtle text-success">
+                  <i class="fas fa-percentage"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Users -->
+          <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+            <div class="card metric-card shadow-sm border-0">
+              <div
+                class="card-body d-flex justify-content-between align-items-center"
+              >
+                <div>
+                  <p class="text-muted mb-1">Users</p>
+                  <h4 class="fw-bold mb-0">{{ stats.total_users }}</h4>
+                </div>
+                <div class="icon-circle bg-warning-subtle text-success">
+                  <i class="fas fa-user fa-lg"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <!-- section for search field and add user button -->
+          <div class="user-management-header mb-2">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <h3 class="mb-0 flex-shrink-0">User Management</h3>
+                
+                <div class="d-flex flex-grow-1 gap-2" style="min-width: 280px;">
+                    <!-- Search Field -->
+                    <div class="search-container flex-grow-1 position-relative">
+                        <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary"></i>
+                        <input 
+                            type="text" 
+                            class="form-control ps-5" 
+                            id="user-search" 
+                            placeholder="Search users..."
+                            aria-label="Search users"
+                        >
+                        <button class="btn btn-link position-absolute end-0 translate-middle-y me-2 clear-search d-none">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Add User Button -->
+                    <button 
+                        class="btn btn-primary btn-add-user flex-shrink-0"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#add-user-Modal"
+                    >
+                        <span class="d-none d-sm-inline">Add User</span>
+                        <i class="fas fa-plus d-sm-none"></i>
+                    </button>
+                </div>
+            </div>
+          </div>
+          </div>
+            <div class="table-responsive mt-2">
+              <table
+                  id="users-table"
+                  class="table table-bordered table-hover table-striped align-middle shadow-sm rounded"
+              >
+                  <thead class="table-primary text-center">
+                      <tr>
+                          <th scope="col">ID</th>
+                          <th scope="col">Gender</th>
+                          <th scope="col">Full Name</th>
+                          <th scope="col">Email</th>
+                          <th scope="col">Role</th>
+                          <th scope="col">Status</th>
+                          <th scope="col">Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for user in users.items %}
+                      <tr>
+                          <td>{{user.id}}</td>
+                          <td>{{user.gender}}</td>
+                          <td>{{user.f_name | capitalize}} {{user.surname | capitalize}}</td>
+                          <td>{{user.email}}</td>
+                          <td>{{user.role | capitalize}}</td>
+                          <td><span class="badge bg-success">Active</span></td>
+                          <td>
+                              <button
+                                  class="btn btn-sm btn-outline-primary me-2"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#edit-user-Modal{{user.id}}"
+                              >
+                                  <i class="fas fa-edit"></i>
+                              </button>
+                              <button
+                                  class="btn btn-sm btn-outline-danger"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#delete-user-Modal{{user.id}}"
+                              >
+                                  <i class="fas fa-trash-alt"></i>
+                              </button>
+                          </td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+              
+              <!-- Pagination -->
+              <nav aria-label="Page navigation" class="mt-2">
+                <ul class="pagination justify-content-center">
+                    <!-- Previous page -->
+                    <li class="page-item {% if not users.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{% if users.has_prev %}{{ url_for('user_management.admin', page=users.prev_num) }}{% else %}#{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">Previous</span>
+                        </a>
+                    </li>
+                    
+                    <!-- Page numbers -->
+                    {% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                        {% if page_num %}
+                            <li class="page-item {% if users.page == page_num %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('user_management.admin', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Next page -->
+                    <li class="page-item {% if not users.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{% if users.has_next %}{{ url_for('user_management.admin', page=users.next_num) }}{% else %}#{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">Next</span>
+                        </a>
+                    </li>
+                </ul>
+              </nav>
+          </div>
+
+          <!-- The Modal For Deleting Users-->
+          {% for user in users%}
+          <div
+            class="modal fade"
+            id="delete-user-Modal{{user.id}}"
+            data-bs-backdrop="static"
+          >
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                  ></button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                  Are you sure you want to delete
+                  <b style="font-weight: 500">{{user.f_name | capitalize}} {{user.surname | capitalize}}</b>?
+                  <br />
+                  <span class="text-danger"
+                    ><i class="fas fa-exclamation-triangle"></i> Warning:</span>
+                  This can not be undone.
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-bs-dismiss="modal"
+                  >
+                    No
+                  </button>
+                  <form
+                    action="{{url_for('user_management.delete_user', user_id=user.id)}}"
+                    method="POST"
+                  >
+                    <button
+                      type="submit"
+                      class="btn btn-danger"
+                      data-bs-dismiss="modal"
+                    >
+                      Yes
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modal For Editing Users-->
+          <div class="modal" id="edit-user-Modal{{ user.id }}">
+            <div class="modal-dialog">
+              <div class="modal-content" style="padding: 30px;">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                  <h3 class="modal-title">Edit User Details</h3>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                  ></button>
+                </div>
+          
+                <!-- Modal Body -->
+                <div class="modal-body">
+                  <form
+                    action="{{ url_for('user_management.edit_user', user_id=user.id) }}"
+                    method="POST"
+                  >
+                    <div class="mb-3">
+                      <label for="firstname{{ user.id }}" class="form-label">First Name</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="firstname{{ user.id }}"
+                        name="firstname"
+                        value="{{ user.f_name }}"
+                        required
+                      />
+                    </div>
+          
+                    <div class="mb-3">
+                      <label for="surname{{ user.id }}" class="form-label">Surname</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="surname{{ user.id }}"
+                        name="surname"
+                        value="{{ user.surname }}"
+                        required
+                      />
+                    </div>
+          
+                    <div class="mb-3">
+                      <label for="role{{ user.id }}" class="form-label">Role</label>
+                      
+                      {% if current_user.role == "super admin" %}
+                      <select
+                        class="form-select"
+                        id="role{{ user.id }}"
+                        name="role"
+                        required
+                      >
+                        <option value="super admin" {% if user.role == "super admin" %}selected{% endif %}>Super Admin</option>
+                        <option value="admin" {% if user.role == "admin" %}selected{% endif %}>Admin</option>
+                        <option value="nurse" {% if user.role == "nurse" %}selected{% endif %}>Nurse</option>
+                        <option value="doctor" {% if user.role == "doctor" %}selected{% endif %}>Doctor</option>
+                      </select>
+                      {% else %}
+                      <select
+                      class="form-select"
+                      id="role{{ user.id }}"
+                      name="role"
+                      required
+                    >
+                      <option value="admin" {% if user.role == "admin" %}selected{% endif %}>Admin</option>
+                      <option value="nurse" {% if user.role == "nurse" %}selected{% endif %}>Nurse</option>
+                      <option value="doctor" {% if user.role == "doctor" %}selected{% endif %}>Doctor</option>
+                    </select>
+                      {% endif %}
+                    </div>
+          
+                    <div class="mb-3">
+                      <label for="email{{ user.id }}" class="form-label">Email</label>
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email{{ user.id }}"
+                        name="email"
+                        value="{{ user.email }}"
+                        required
+                      />
+                    </div>
+          
+                    <button
+                      type="submit"
+                      class="btn btn-primary w-100"
+                    >
+                      Save Changes
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {% endfor %}
+        </div>
+        <!-- Add User Modal -->
+        <div class="modal fade" id="add-user-Modal" data-bs-backdrop="static">
+          <div class="modal-dialog">
+              <div class="modal-content" style="padding: 30px;">
+                  <!-- Modal Header -->
+                  <div class="modal-header">
+                      <h3 class="modal-title">Add New User</h3>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+          
+                  <!-- Modal Body -->
+                  <div class="modal-body">
+                      <form action=""  onsubmit="handleAddUserSubmit(event)">
+                          <div class="mb-3">
+                              <label for="add-firstname" class="form-label">First Name</label>
+                              <input
+                                  type="text"
+                                  class="form-control"
+                                  id="firstname"
+                                  name="firstname"
+                                  required
+                              />
+                              <p
+                            id="firstname-error"
+                            class="error mt-1 text-sm text-red-600"
+                            style="color: red; font-size: 13px; font-weight: 400"
+                          ></p>
+                          </div>
+                          
+          
+                          <div class="mb-3">
+                              <label for="add-surname" class="form-label">Surname</label>
+                              <input
+                                  type="text"
+                                  class="form-control"
+                                  id="surname"
+                                  name="surname"
+                                  required
+                              />
+                              <p
+                                id="surname-error"
+                                class="error mt-1 text-sm text-red-600"
+                                style="color: red; font-size: 13px; font-weight: 400"
+                              ></p>
+                          </div>
+          
+                          <div class="mb-3">
+                              <label for="add-role" class="form-label">Role</label>
+                              <select
+                                  class="form-select"
+                                  id="role"
+                                  name="role"
+                                  required
+                              >
+                                  <option value="" disabled selected></option>
+                                  <option value="admin">Admin</option>
+                                  <option value="doctor">Doctor</option>
+                                  <option value="nurse">Nurse</option>
+                              </select>
+                              <p
+                                id="role-error"
+                                class="error mt-1 text-sm text-red-600"
+                                style="color: red; font-size: 13px; font-weight: 400"
+                              ></p>
+                          </div>
+          
+                          <div class="mb-3">
+                              <label for="add-email" class="form-label">Email</label>
+                              <input
+                                  type="email"
+                                  class="form-control"
+                                  id="email"
+                                  name="email"
+                                  required
+                              />
+                              <p
+                                id="email-error"
+                                class="error mt-1 text-sm text-red-600"
+                                style="color: red; font-size: 13px; font-weight: 400"
+                              ></p>
+                          </div>
+
+                          <div class="mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select
+                                class="form-select"
+                                id="gender"
+                                name="gender"
+                                required
+                            >
+                                <option value="" disabled selected></option>
+                                <option value="Female">Female</option>
+                                <option value="Male">Male</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <p
+                              id="gender-error"
+                              class="error mt-1 text-sm text-red-600"
+                              style="color: red; font-size: 13px; font-weight: 400"
+                            ></p>
+                         </div>
+          
+                          <div class="mb-3">
+                              <label for="add-password" class="form-label">Password</label>
+                              <input
+                                  type="password"
+                                  class="form-control"
+                                  id="password"
+                                  name="password"
+                                  required
+                              />
+                              <p
+                                id="password-error"
+                                class="error mt-1 text-sm text-red-600"
+                                style="color: red; font-size: 13px; font-weight: 400"
+                              ></p>
+                          </div>
+          
+                          <button type="submit" class="btn btn-primary w-100">
+                              Add User
+                          </button>
+                      </form>
+                  </div>
+              </div>
+          </div>
+        </div>
+        <div>
+          <footer class="text-center py-2 mt-3 w-100">
+            <p class="text-muted mb-0">
+              &copy; 2025 CervixVision. All rights reserved.
+            </p>
+          </footer>
+        </div>
+        </div>
+      </main>
+      
+    </div>
+      
+    </div>
+    
+    <script src="{{url_for('static', filename='admin-user-search.js')}}"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+  </body>
+</html>

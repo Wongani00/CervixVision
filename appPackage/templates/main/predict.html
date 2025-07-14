@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cervical Cancer Prediction System" />
+    <meta name="keywords" content="Cervical Cancer, Prediction, Healthcare" />
+    <meta name="author" content="Health System Team" />
+    <link
+      icons
+      rel="icon"
+      href="{{url_for('static', filename='hospital-healthcare-and-medical-svgrepo-com.svg')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/fontawesome.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/brands.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/solid.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='predict.css')}}"
+    />
+    <title>Classify-Cervical-Cancer</title>
+  </head>
+  <style>
+    #submitBtn {
+      transition: all 0.3s ease;
+    }
+
+    #submitBtn:hover {
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      box-shadow: 0 0 12px rgba(102, 126, 234, 0.6);
+      transform: scale(1.01);
+    }
+    .drop-zone {
+      border: 2px dashed #dee2e6;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background-color: #f8f9fa;
+    }
+
+    .drop-zone:hover {
+      border-color: #0d6efd;
+      background-color: #e7f1ff;
+    }
+
+    .drop-zone.drag-over {
+      border-color: #0d6efd;
+      background-color: #e7f1ff;
+      transform: scale(1.02);
+    }
+
+    .file-info {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #e8f5e8;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .preview-container {
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .preview-image {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container {
+      max-width: auto;
+      margin: 0.6rem auto;
+      padding: 40px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      background: white;
+    }
+
+    .status-badge {
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+
+    .status-badge.reliable {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .status-badge.unreliable {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .image-display-section {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .medical-image {
+      max-width: 150px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .image-meta {
+      flex: 1;
+    }
+
+    .meta-item {
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .meta-item label {
+      font-weight: bold;
+      width: 80px;
+      margin-right: 10px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .result-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-card.primary {
+      border-left: 4px solid #007bff;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .card-header i {
+      margin-right: 10px;
+      color: #007bff;
+    }
+
+    .prediction-value {
+      font-size: 1.5em;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .prediction-value.normal {
+      color: #28a745;
+    }
+
+    .prediction-value.koilocytotic,
+    .prediction-value.dysplastic,
+    .prediction-value.cin1,
+    .prediction-value.cin2,
+    .prediction-value.cin3 {
+      color: #dc3545;
+    }
+
+    .confidence-meter {
+      background: #e9ecef;
+      border-radius: 10px;
+      height: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .meter-bar {
+      background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+      height: 100%;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 0.8em;
+    }
+
+    .clinical-notes {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .notes-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .notes-header i {
+      margin-right: 10px;
+      color: #007bff;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn-action {
+      padding: 12px 25px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-action.primary {
+      background: linear-gradient(135deg, #007bff, #0056b3);
+      color: white;
+    }
+
+    .btn-action.warning {
+      background: linear-gradient(135deg, #ffc107, #e0a800);
+      color: #212529;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .alert {
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+    }
+
+    .alert-danger {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+
+    .alert-warning {
+      color: #856404;
+      background-color: #fff3cd;
+      border-color: #ffeaa7;
+    }
+
+    @media (max-width: 768px) {
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .image-display-section {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <body>
+    <div class="container">
+      <!-- sidebar content -->
+      <aside>
+        <div class="top">
+          <a href="{{url_for('main.home')}}"
+            ><div class="logo">
+              <img
+                src="{{url_for('static', filename='CervixVision.png')}}"
+                alt="icon"
+              />
+              <h2 class="head">CervixVision</h2>
+            </div></a
+          >
+          <div class="close-btn">
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+        </div>
+        <div class="sidebar">
+          {% if current_user.is_authenticated %} {% if current_user.role in
+          ['admin', 'super admin', 'doctor']%}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          {%if current_user.role in ['admin', 'super admin']%}
+          <a href="{{url_for('user_management.admin')}}">
+            <i class="fas fa-user-shield"></i>
+            <h3>Admin</h3>
+          </a>
+          {%endif%}
+
+          <a href="{{url_for('main.dashboard')}}">
+            <i class="fas fa-tachometer-alt"></i>
+            <h3>Dashboard</h3>
+          </a>
+          {% if current_user.role == "doctor" %}
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+          {%endif%}
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>Results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          {% if current_user.role in ['admin', 'super admin'] %}
+          <a href="{{url_for('main.reports')}}">
+            <i class="fas fa-file-alt"></i>
+            <h3>Reports</h3>
+          </a>
+          {% endif %}
+          <!--<a href="#">
+                    <i class="fas fa-question-circle"></i>
+                    <h3>Help</h3>
+                  </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% else %}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          <!--<a href="#">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Help</h3>
+                      </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% endif %} {% else %}
+          <a href="{{url_for('auth.login')}}"> Login </a>
+          {% endif %}
+        </div>
+      </aside>
+
+      <!-- right section content -->
+      <div class="right">
+        <div class="top">
+          <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+          </div>
+          <!--user profile photo-->
+          <div class="profile">
+            <div class="profile-info">
+              <h2>
+                Hello,
+                <b>{{current_user.f_name | capitalize}}</b>
+              </h2>
+            </div>
+            <div class="profile-pic">
+              <a href="{{url_for('main.user_profile')}}" class="profile-link">
+                {% if current_user.profile_pic %}
+                <img
+                  src="{{url_for('static', filename='profile_pics/' + current_user.profile_pic)}}"
+                  alt="Profile Picture"
+                />
+                {% else %}
+                <a href="{{ url_for('auth.user_profile') }}">
+                  <!--<img
+                    src="{{ url_for('static', filename='profile_pictures/' + current_user.profile_pic) if current_user.profile_pic else url_for('static', filename='profile_pictures/default-premium.png') }}"
+                    alt="Profile Picture"
+                  />-->
+                  <img
+                    src="{{url_for('static', filename='/profile_pictures/user.png')}}"
+                    alt="pic"
+                  />
+                </a>
+                {% endif %}
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- content for model's prediction form -->
+
+        <!-- prediction form -->
+        <div class="form-container" id="prediction-form">
+          <h2 class="text-center mb-4">
+            <i class="fas fa-cloud-upload-alt text-primary"></i>
+            Upload Cervical Image For Prediction
+          </h2>
+
+          <form id="uploadForm">
+            <!-- Name Field -->
+            <div class="mb-3">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="firstname" class="form-label">
+                    <i class="fas fa-id-card"></i> First Name
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="firstname"
+                    name="firstname"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="surname" class="form-label">
+                    <i class="fas fa-id-card"></i> Surname
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="surname"
+                    name="surname"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Date Fields -->
+            <div class="mb-3">
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="userDOB" class="form-label">
+                    <i class="fas fa-calendar-alt"></i> Date of Birth
+                  </label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="userDOB"
+                    name="DOB"
+                    max="2004-12-31"
+                    required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="predictionDate" class="form-label">
+                    <i class="fas fa-calendar-alt"></i> Date of Prediction
+                  </label>
+                  <input
+                    type="date"
+                    class="form-control"
+                    id="predictionDate"
+                    name="predictionDate"
+                    disabled
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- File Upload Field -->
+            <div class="mb-3">
+              <label class="form-label">
+                <i class="fas fa-image"></i> Upload Image
+              </label>
+              <div class="drop-zone" id="dropZone">
+                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-2"></i>
+                <p class="mb-2">Drag and drop your image here</p>
+                <p class="text-muted">or</p>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  onclick="document.getElementById('fileInput').click()"
+                >
+                  <i class="fas fa-folder-open"></i> Browse Files
+                </button>
+                <input
+                  type="file"
+                  id="fileInput"
+                  name="image"
+                  accept="image/*"
+                  style="display: none"
+                />
+              </div>
+
+              <div id="fileInfo" class="file-info">
+                <i class="fas fa-check-circle text-success"></i>
+                <span id="fileName"></span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger float-end"
+                  id="removeFile"
+                >
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <div id="previewContainer" class="preview-container"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+              <button
+                type="submit"
+                class="btn btn-lg"
+                id="submitBtn"
+                style="
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  color: white;
+                  border: none;
+                "
+              >
+                <i class="fas fa-chart-line"></i> Predict
+              </button>
+            </div>
+          </form>
+
+          <div class="mt-2" id="resultSection" style="display: none"></div>
+        </div>
+        <!--<div class="card shadow p-4 my-3 rounded-4 border-success">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="text-success fw-bold mb-0">Prediction: Koilocytotic</h5>
+            <span class="badge bg-primary">Confidence: 92.3%</span>
+          </div>
+          <p class="mt-2 text-muted">Based on uploaded cervix image.</p>
+          <img
+            src="{{ image_url }}"
+            class="img-fluid rounded mt-2"
+            style="max-height: 200px"
+            alt="Uploaded image"
+          />
+          <div class="mt-3">
+            <button
+              class="btn btn-outline-primary"
+              onclick="openAppointmentForm()"
+            >
+              Schedule Screening
+            </button>
+          </div>
+        </div>-->
+        <div>
+          <footer class="text-center py-2 mt-3 w-100">
+            <p class="mb-0 text-muted">
+              &copy; 2025 CervixVision. All rights reserved.
+            </p>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Form elements
+        const form = document.getElementById("uploadForm");
+        const dropZone = document.getElementById("dropZone");
+        const fileInput = document.getElementById("fileInput");
+        const fileInfo = document.getElementById("fileInfo");
+        const fileName = document.getElementById("fileName");
+        const removeFile = document.getElementById("removeFile");
+        const previewContainer = document.getElementById("previewContainer");
+        const submitBtn = document.getElementById("submitBtn");
+        const resultSection = document.getElementById("resultSection");
+        const firstnameInput = document.getElementById("firstname");
+        const surnameInput = document.getElementById("surname");
+        const userDOBInput = document.getElementById("userDOB");
+        const predictionDateInput = document.getElementById("predictionDate");
+
+        // Current image data URL for result display
+        let currentImageDataUrl = null;
+
+        // Set default prediction date to today
+        const today = new Date().toISOString().split("T")[0];
+        predictionDateInput.value = today;
+
+        // ====== Drag and Drop Handlers ======
+        dropZone.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          dropZone.classList.add("drag-over");
+        });
+
+        dropZone.addEventListener("dragleave", (e) => {
+          e.preventDefault();
+          dropZone.classList.remove("drag-over");
+        });
+
+        dropZone.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dropZone.classList.remove("drag-over");
+          handleDroppedFiles(e.dataTransfer.files);
+        });
+
+        // ====== File Input Change Handler ======
+        fileInput.addEventListener("change", (e) => {
+          if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+          }
+        });
+
+        // ====== Remove File Handler ======
+        removeFile.addEventListener("click", (e) => {
+          e.preventDefault();
+          resetForm();
+        });
+
+        // ====== Form Submission Handler ======
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          console.log("Form submitted");
+
+          // Validate form
+          if (!validateForm()) return;
+
+          // Prepare form data
+          const formData = prepareFormData();
+
+          // Submit form to Flask backend
+          await submitPredictionForm(formData);
+        });
+
+        // ====== Helper Functions ======
+
+        function handleDroppedFiles(files) {
+          if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith("image/")) {
+              handleFileSelect(file);
+            } else {
+              showError("Please select an image file only.");
+            }
+          }
+        }
+
+        function handleFileSelect(file) {
+          console.log("File selected:", file.name);
+          // Clear previous results/errors
+          clearResults();
+
+          // Store file in input
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          fileInput.files = dt.files;
+
+          // Show file info
+          fileName.textContent = file.name;
+          fileInfo.style.display = "block";
+
+          // Read and display image preview
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            currentImageDataUrl = e.target.result;
+            previewContainer.innerHTML = `
+              <img src="${currentImageDataUrl}" class="preview-image rounded-3 shadow-sm" 
+                   alt="Preview" />
+            `;
+          };
+          reader.readAsDataURL(file);
+        }
+
+        function validateForm() {
+          console.log("Validating form...");
+
+          if (!fileInput.files || fileInput.files.length === 0) {
+            showError("Please select an image file.");
+            return false;
+          }
+
+          if (!firstnameInput.value.trim()) {
+            showError("Please enter your first name.");
+            return false;
+          }
+
+          if (!surnameInput.value.trim()) {
+            showError("Please enter your surname.");
+            return false;
+          }
+
+          if (!userDOBInput.value) {
+            showError("Please enter your date of birth.");
+            return false;
+          }
+
+          if (!predictionDateInput.value) {
+            showError("Please enter the prediction date.");
+            return false;
+          }
+
+          const dob = new Date(userDOBInput.value);
+          const predDate = new Date(predictionDateInput.value);
+          const age = predDate.getFullYear() - dob.getFullYear();
+          const monthDiff = predDate.getMonth() - dob.getMonth();
+          const dayDiff = predDate.getDate() - dob.getDate();
+
+          const isUnder21 =
+            age < 21 ||
+            (age === 21 && monthDiff < 0) ||
+            (age === 21 && monthDiff === 0 && dayDiff < 0);
+
+          if (isUnder21) {
+            showError(
+              "Patient age must be at least 21 years at the time of prediction."
+            );
+            return false;
+          }
+
+          //console.log("Form validation passed");
+          return true;
+        }
+
+        function prepareFormData() {
+          const formData = new FormData();
+          formData.append("firstname", firstnameInput.value.trim());
+          formData.append("surname", surnameInput.value.trim());
+          formData.append("userDOB", userDOBInput.value);
+          formData.append("predictionDate", predictionDateInput.value);
+          formData.append("image", fileInput.files[0]);
+          //console.log("Form data prepared");
+          return formData;
+        }
+
+        async function submitPredictionForm(formData) {
+          //console.log("Submitting form...");
+          // Show loading state
+          setLoadingState(true);
+
+          try {
+            // Send POST request to Flask backend
+            const response = await fetch("/prediction", {
+              method: "POST",
+              body: formData,
+              credentials: "include", // Include cookies for authentication
+            });
+
+            const data = await response.json();
+            //console.log("Response received:", data);
+
+            if (!response.ok) {
+              // Handle error responses (400, 500, etc.)
+              if (data.error) {
+                if (data.ood_status === "rejected") {
+                  // Show unreliable prediction warning
+                  showUnreliablePredictionWarning(data);
+                } else {
+                  showError(data.error);
+                }
+              } else {
+                showError("An error occurred while processing your request.");
+              }
+              return;
+            }
+
+            // Success response - display results
+            displayResults(data, currentImageDataUrl);
+
+            // Reset form (but keep results visible)
+            resetForm(false);
+          } catch (error) {
+            //console.error("Network error:", error);
+            showError(
+              "Network error occurred. Please check your connection and try again."
+            );
+          } finally {
+            setLoadingState(false);
+          }
+        }
+
+        function calculateAge(dobString, predDateString) {
+          const dob = new Date(dobString);
+          const predDate = new Date(predDateString);
+          let age = predDate.getFullYear() - dob.getFullYear();
+          const monthDiff = predDate.getMonth() - dob.getMonth();
+
+          if (
+            monthDiff < 0 ||
+            (monthDiff === 0 && predDate.getDate() < dob.getDate())
+          ) {
+            age--;
+          }
+
+          return age;
+        }
+
+        function displayResults(data, imageDataUrl) {
+          console.log("Displaying results:", data);
+          resultSection.innerHTML = createResultCard(data, imageDataUrl);
+          resultSection.style.display = "block";
+
+          // Add retry button event listener if needed
+          const retryBtn = document.getElementById("retry-btn");
+          if (retryBtn) {
+            retryBtn.addEventListener("click", () => {
+              resetForm(true);
+            });
+          }
+        }
+
+        function showUnreliablePredictionWarning(data) {
+          console.log("Showing unreliable prediction warning:", data);
+          resultSection.innerHTML = `
+            <div class="alert alert-warning" role="alert">
+              <!--<h4 class="alert-heading">
+                <i class="fas fa-exclamation-triangle"></i> Unreliable Prediction
+              </h4>-->
+              <p><strong>${data.error}</strong></p>
+              <hr>
+              <div class="row">
+                <!-- <div class="col-md-4">
+                  <strong>Confidence:</strong> ${(
+                    data.confidence * 100
+                  ).toFixed(2)}%
+                </div>
+                <div class="col-md-4">
+                  <strong>Entropy:</strong> ${data.entropy}
+                </div>
+                <div class="col-md-4">
+                  <strong>Score Gap:</strong> ${data.score_gap}
+                </div> -->
+              </div>
+              <div class="mt-3">
+                <p class="mb-0"><strong>Recommendation:</strong> ${
+                  data.recommendation
+                }</p>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-warning" onclick="location.reload()">
+                  <i class="fas fa-redo"></i> Try Again
+                </button>
+              </div>
+            </div>
+          `;
+          resultSection.style.display = "block";
+        }
+
+        function createResultCard(data, imageDataUrl) {
+          return `
+          <div class="prediction-result-container">
+            <div class="prediction-header">
+              <div class="header-content">
+                <h3><i class="fas fa-microscope"></i> Cervical Analysis Report</h3>
+                <div class="status-badge ${
+                  data.ood_status === "accepted" ? "reliable" : "unreliable"
+                }">
+                  <i class="fas ${
+                    data.ood_status === "accepted"
+                      ? "fa-check-circle"
+                      : "fa-exclamation-triangle"
+                  }"></i>
+                  ${
+                    data.ood_status === "accepted"
+                      ? "Reliable Prediction"
+                      : "Unreliable Prediction"
+                  }
+                </div>
+              </div>
+              <div class="patient-id">
+                <span>${new Date().toLocaleDateString()}</span>
+                <span>${data.first_name.substring(
+                  0,
+                  3
+                )}${data.surname.substring(0, 3)}${Math.floor(Math.random() * 9000) + 1000}</span>
+              </div>
+            </div>
+
+            <div class="image-display-section">
+              <div class="image-container">
+                <img src="${imageDataUrl}" alt="Cervical Sample" class="medical-image">
+              </div>
+              <div class="image-meta">
+                <div class="meta-item">
+                  <label>Patient:</label>
+                  <span>${data.first_name} ${data.surname}</span>
+                </div>
+                <div class="meta-item">
+                  <label>Age:</label>
+                  <span>${data.age}</span>
+                </div>
+                <!-- <div class="meta-item">
+                  <label>Entropy:</label>
+                  <span>${data.entropy}</span>
+                </div>
+                <div class="meta-item">
+                  <label>Score Gap:</label>
+                  <span>${data.score_gap}</span>
+                </div> -->
+              </div>
+            </div>
+
+            <div class="results-grid">
+              <div class="result-card primary">
+                <div class="card-header">
+                  <i class="fas fa-diagnoses"></i>
+                  <h4>Prediction</h4>
+                </div>
+                <div class="card-content">
+                  <div class="prediction-value ${data.result.toLowerCase()}">
+                    ${data.result || "N/A"}
+                  </div>
+                  <!-- <div class="prediction-description">
+                    ${getPredictionDescription(data.result)}
+                  </div> -->
+                </div>
+              </div>
+
+              <div class="result-card">
+                <div class="card-header">
+                  <i class="fas fa-chart-line"></i>
+                  <h4>Confidence</h4>
+                </div>
+                <div class="card-content">
+                  <div class="confidence-meter">
+                    <div class="meter-bar" style="width: ${(
+                      data.confidence * 100
+                    ).toFixed(0)}%">
+                      <span>${(data.confidence * 100).toFixed(2)}%</span>
+                    </div>
+                  </div>
+                  <div class="confidence-description">
+                    ${getConfidenceLevel(data.confidence)}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="clinical-notes">
+              <div class="notes-header">
+                <i class="fas fa-clipboard-check"></i>
+                <h4>Clinical Notes</h4>
+              </div>
+              <div class="notes-content">
+                ${
+                  data.ood_status === "accepted"
+                    ? `
+                  <p>This prediction shows <strong>${
+                    data.result
+                  }</strong> with <strong>${(data.confidence * 100).toFixed(
+                        2
+                      )}% confidence</strong>.</p>
+                  <p>Note: This prediction is a <b>clinical decision support tool</b>, not a final diagnosis! <br>
+                  <strong>Doctor</strong> should review It For a final decision</p>
+                  <!-- <p><strong>Technical Details:</strong></p>
+                  <ul>
+                    <li>Entropy: ${data.entropy}</li>
+                    <li>Score Gap: ${data.score_gap}</li>
+                    <li>OOD Status: ${data.ood_status}</li>
+                  </ul> -->
+                `
+                    : `
+                  <p class="warning">The prediction for <strong>${
+                    data.result
+                  }</strong> with <strong>${(data.confidence * 100).toFixed(
+                        2
+                      )}% confidence</strong> does not meet reliability standards.</p>
+                  <p>Recommend recollecting the sample with proper technique and resubmitting for analysis.</p>
+                `
+                }
+              </div>
+            </div>
+
+            <div class="action-buttons">
+              ${
+                data.ood_status === "accepted"
+                  ? `
+                <!-- <button class="btn-action primary" onclick="alert('Scheduling feature would be implemented here')">
+                  <i class="fas fa-calendar-check"></i> Schedule Follow-up
+                </button> -->
+              `
+                  : `
+                <button id="retry-btn" class="btn-action warning">
+                  <i class="fas fa-redo"></i> Retest Sample
+                </button>
+              `
+              }
+            </div>
+          </div>
+          `;
+        }
+
+        function resetForm(clearResults = true) {
+          console.log("Resetting form");
+          form.reset();
+          fileInput.value = "";
+          fileInfo.style.display = "none";
+          previewContainer.innerHTML = "";
+          currentImageDataUrl = null;
+
+          // Reset prediction date to today
+          predictionDateInput.value = today;
+
+          if (clearResults) {
+            resultSection.style.display = "none";
+            resultSection.innerHTML = "";
+          }
+        }
+
+        function clearResults() {
+          resultSection.style.display = "none";
+          resultSection.innerHTML = "";
+        }
+
+        function showError(message) {
+          console.log("Showing error:", message);
+          resultSection.innerHTML = `
+            <div class="alert alert-danger" role="alert">
+              <i class="fas fa-exclamation-triangle"></i> ${message}
+            </div>`;
+          resultSection.style.display = "block";
+        }
+
+        function setLoadingState(isLoading) {
+          console.log("Setting loading state:", isLoading);
+          submitBtn.disabled = isLoading;
+          submitBtn.innerHTML = isLoading
+            ? '<i class="fas fa-spinner fa-spin"></i> Processing...'
+            : '<i class="fas fa-chart-line"></i> Predict';
+        }
+
+        // Helper functions for result display
+        function getPredictionDescription(prediction) {
+          const descriptions = {
+            Normal: "No abnormal cells detected",
+            Koilocytotic: "Possible HPV-related changes",
+            Dysplastic: "Abnormal cell growth detected",
+            CIN1: "Mild dysplasia",
+            CIN2: "Moderate dysplasia",
+            CIN3: "Severe dysplasia",
+          };
+          return (
+            descriptions[prediction] || "Consult physician for interpretation"
+          );
+        }
+
+        function getConfidenceLevel(confidence) {
+          if (confidence >= 0.9) return "Very High Confidence";
+          if (confidence >= 0.7) return "High Confidence";
+          if (confidence >= 0.5) return "Moderate Confidence";
+          return "Low Confidence";
+        }
+      });
+    </script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+  </body>
+</html>

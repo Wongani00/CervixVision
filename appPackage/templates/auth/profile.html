@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cervical Cancer Prediction System" />
+    <meta name="keywords" content="Cervical Cancer, Prediction, Healthcare" />
+    <meta name="author" content="Health System Team" />
+    <link
+      icons
+      rel="icon"
+      href="{{url_for('static', filename='hospital-healthcare-and-medical-svgrepo-com.svg')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/fontawesome.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/brands.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/solid.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}"
+    />
+    <link rel="stylesheet" href="{{url_for('static', filename='index.css')}}" />
+    <title>User | Profile</title>
+    <style>
+      /* Premium Color Scheme */
+      :root {
+        --primary: #6c5ce7;
+        --primary-light: #a29bfe;
+        --primary-dark: #5649c0;
+        --secondary: #00cec9;
+        --accent: #fd79a8;
+        --text: #2d3436;
+        --text-light: #636e72;
+        --bg: #f9f9f9;
+        --card-bg: rgba(255, 255, 255, 0.9);
+        --glass: rgba(255, 255, 255, 0.15);
+        --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      /* Base Styles */
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      /* Glassmorphism Effect */
+      .glassmorphism {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: var(--shadow);
+        border-radius: 12px;
+      }
+
+      /* Neumorphism Effect */
+      .neumorphism {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 8px 8px 16px #d9d9d9, -8px -8px 16px #ffffff;
+      }
+
+      /* Profile Hero Card */
+      .profile-hero-card {
+        padding: 2rem;
+        margin-bottom: 2rem;
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: white;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .profile-hero-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(255, 255, 255, 0.1) 0%,
+          rgba(255, 255, 255, 0) 70%
+        );
+      }
+
+      .profile-hero-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .avatar-container {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+      }
+
+      .avatar-wrapper {
+        position: relative;
+      }
+
+      .avatar-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        border: 3px solid white;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        transition: var(--transition);
+      }
+
+      .avatar-preview:hover {
+        transform: scale(1.05);
+      }
+
+      .edit-icon {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 36px;
+        height: 36px;
+        background: var(--accent);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .edit-icon:hover {
+        background: #e84393;
+        transform: scale(1.1);
+      }
+
+      .online-status {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 16px;
+        height: 16px;
+        background: #00b894;
+        border: 2px solid white;
+        border-radius: 50%;
+      }
+
+      .profile-meta {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .profile-name {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+        letter-spacing: 0.5px;
+      }
+
+      .profile-title {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+      }
+
+      .profile-stats {
+        display: flex;
+        gap: 1.5rem;
+      }
+
+      .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+
+      .stat-item i {
+        font-size: 0.8rem;
+      }
+
+      .profile-actions {
+        display: flex;
+        gap: 1rem;
+      }
+
+      .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 30px;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn-edit {
+        background: white;
+        color: var(--primary);
+      }
+
+      .btn-edit:hover {
+        background: #f1f1f1;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-share {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        backdrop-filter: blur(5px);
+      }
+
+      .btn-share:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+      }
+
+      /* Profile Edit Card */
+      .profile-edit-card {
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .profile-edit-card .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .profile-edit-card h3 {
+        font-size: 1.5rem;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .edit-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+      }
+
+      input:checked + .slider {
+        background-color: var(--primary);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .slider.round {
+        border-radius: 34px;
+      }
+
+      .slider.round:before {
+        border-radius: 50%;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+      }
+
+      .form-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .form-group {
+        position: relative;
+      }
+
+      .floating-label {
+        position: relative;
+        padding-top: 20px;
+      }
+
+      .floating-label input,
+      .floating-label select,
+      .floating-label textarea {
+        width: 100%;
+        padding: 10px 0;
+        border: none;
+        border-bottom: 1px solid #ddd;
+        background-color: transparent;
+        font-size: 1rem;
+        transition: var(--transition);
+      }
+
+      .floating-label textarea {
+        min-height: 100px;
+        resize: vertical;
+      }
+
+      .floating-label input:focus,
+      .floating-label select:focus,
+      .floating-label textarea:focus {
+        outline: none;
+        border-bottom-color: var(--primary);
+      }
+
+      .floating-label label {
+        position: absolute;
+        top: 25px;
+        left: 0;
+        color: var(--text-light);
+        transition: var(--transition);
+        pointer-events: none;
+      }
+
+      .floating-label input:focus + label,
+      .floating-label input:not(:placeholder-shown) + label,
+      .floating-label select:focus + label,
+      .floating-label select:not([value=""]) + label,
+      .floating-label textarea:focus + label,
+      .floating-label textarea:not(:placeholder-shown) + label {
+        top: 0;
+        font-size: 0.8rem;
+        color: var(--primary);
+      }
+
+      .underline {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--primary);
+        transition: var(--transition);
+      }
+
+      .floating-label input:focus ~ .underline,
+      .floating-label select:focus ~ .underline,
+      .floating-label textarea:focus ~ .underline {
+        width: 100%;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .btn-cancel,
+      .btn-save {
+        padding: 0.75rem 1.75rem;
+        border-radius: 30px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .btn-cancel {
+        background: transparent;
+        border: 1px solid #ddd;
+        color: var(--text-light);
+      }
+
+      .btn-cancel:hover {
+        background: #f8f9fa;
+        border-color: #ccc;
+      }
+
+      .btn-save {
+        background: var(--primary);
+        border: none;
+        color: white;
+      }
+
+      .btn-save:hover {
+        background: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+      }
+
+      /* Security Card */
+      .security-card {
+        padding: 2rem;
+      }
+
+      .security-card .card-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      }
+
+      .security-card h3 {
+        font-size: 1.5rem;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .security-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .security-item {
+        display: flex;
+        align-items: center;
+        padding: 1.25rem;
+        background: var(--card-bg);
+        border-radius: 10px;
+        transition: var(--transition);
+      }
+
+      .security-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .security-icon {
+        width: 48px;
+        height: 48px;
+        background: rgba(108, 92, 231, 0.1);
+        color: var(--primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1.5rem;
+        font-size: 1.25rem;
+      }
+
+      .security-content {
+        flex: 1;
+      }
+
+      .security-content h4 {
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .security-content p {
+        color: var(--text-light);
+        font-size: 0.9rem;
+        margin: 0;
+      }
+
+      .btn-security {
+        background: transparent;
+        border: none;
+        color: var(--primary);
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+      }
+
+      .btn-security:hover {
+        color: var(--primary-dark);
+      }
+
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .switch .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+      }
+
+      .switch .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+      }
+
+      .switch input:checked + .slider {
+        background-color: var(--primary);
+      }
+
+      .switch input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+
+      .switch .slider.round {
+        border-radius: 34px;
+      }
+
+      .switch .slider.round:before {
+        border-radius: 50%;
+      }
+
+      /* Password Modal */
+      .modal-content.glassmorphism {
+        border: none;
+        overflow: hidden;
+      }
+
+      .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .modal-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .modal-body {
+        padding: 2rem;
+      }
+
+      .password-form .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .toggle-password {
+        position: absolute;
+        right: 0;
+        bottom: 10px;
+        background: none;
+        border: none;
+        color: var(--text-light);
+        cursor: pointer;
+      }
+
+      .password-strength {
+        margin: 1.5rem 0;
+      }
+
+      .strength-meter {
+        height: 6px;
+        background: #eee;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+
+      .strength-bar {
+        height: 100%;
+        width: 0;
+        background: #ff4757;
+        transition: width 0.3s ease;
+      }
+
+      .strength-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: var(--text-light);
+      }
+
+      .password-requirements {
+        margin-top: 1.5rem;
+      }
+
+      .password-requirements p {
+        font-size: 0.9rem;
+        color: var(--text-light);
+        margin-bottom: 0.5rem;
+      }
+
+      .password-requirements ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .password-requirements li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+        color: var(--text-light);
+      }
+
+      .password-requirements li i {
+        font-size: 0.5rem;
+        color: #ff4757;
+      }
+
+      .modal-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+      }
+
+      .btn-modal {
+        padding: 0.75rem 1.75rem;
+        border-radius: 30px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .btn-cancel {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+
+      .btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .btn-confirm {
+        background: white;
+        border: none;
+        color: var(--primary);
+      }
+
+      .btn-confirm:hover {
+        background: #f1f1f1;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 992px) {
+        .profile-hero-content {
+          flex-direction: column;
+          gap: 2rem;
+          text-align: center;
+        }
+
+        .avatar-container {
+          flex-direction: column;
+        }
+
+        .profile-stats {
+          justify-content: center;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-content{
+          margin-top: 4.2rem;
+        }
+        .profile-hero-card,
+        .profile-edit-card,
+        .security-card {
+          padding: 1.5rem;
+        }
+
+        .profile-name {
+          font-size: 1.75rem;
+        }
+
+        .profile-actions {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- sidebar content -->
+      <aside>
+        <div class="top">
+          <a href="{{url_for('main.home')}}"
+            ><div class="logo">
+              <img
+                src="{{url_for('static', filename='CervixVision.png')}}"
+                alt="icon"
+              />
+              <h2 class="head">CervixVision</h2>
+            </div></a
+          >
+          <div class="close-btn">
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+        </div>
+        <div class="sidebar">
+          {% if current_user.is_authenticated %} {% if current_user.role in
+          ['admin', 'super admin', 'doctor']%}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          {%if current_user.role in ['admin', 'super admin']%}
+          <a href="{{url_for('user_management.admin')}}">
+            <i class="fas fa-user-shield"></i>
+            <h3>Admin</h3>
+          </a>
+          {%endif%}
+
+          <a href="{{url_for('main.dashboard')}}">
+            <i class="fas fa-tachometer-alt"></i>
+            <h3>Dashboard</h3>
+          </a>
+          {% if current_user.role == "doctor" %}
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+          {%endif%}
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>Results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          {% if current_user.role in ['admin', 'super admin'] %}
+          <a href="{{url_for('main.reports')}}">
+            <i class="fas fa-file-alt"></i>
+            <h3>Reports</h3>
+          </a>
+          {% endif %}
+          <!--<a href="#">
+                    <i class="fas fa-question-circle"></i>
+                    <h3>Help</h3>
+                  </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% else %}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          <!--<a href="#">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Help</h3>
+                      </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% endif %} {% else %}
+          <a href="{{url_for('auth.login')}}"> Login </a>
+          {% endif %}
+        </div>
+      </aside>
+
+      <!-- right section content -->
+      <div class="right">
+        <div class="top">
+          <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+          </div>
+
+          <!--user profile photo-->
+          <div class="profile">
+            <div class="profile-info">
+              <h2>Hello, <b>{{current_user.f_name | capitalize}}</b></h2>
+            </div>
+            <div class="profile-pic">
+              <a href="{{ url_for('auth.user_profile') }}">
+                <!--<img
+                  src="{{ url_for('static', filename='profile_pictures/' + current_user.profile_pic) if current_user.profile_pic else url_for('static', filename='profile_pictures/default-premium.png') }}"
+                  alt="Profile Picture"
+                />-->
+                <img
+                src="{{url_for('static', filename='/profile_pictures/user.png')}}"
+                alt="pic"
+              />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- section for profile content -->
+         <!-- Premium Profile Section -->
+        <section class="main-content">
+          <div class="insights">
+            <!-- Profile Hero Card -->
+            <div class="card profile-hero-card glassmorphism">
+              <div class="profile-hero-content">
+                <div class="avatar-container">
+                  <div class="avatar-wrapper">
+                    <div class="avatar-preview" id="avatarPreview" 
+                        style="background-image: url('{{ url_for('static', filename='profile_pictures/' + current_user.profile_pic) if current_user.profile_pic else url_for('static', filename='profile_pictures/default-premium.png') }}')">
+                      <div class="avatar-edit">
+                        <input type="file" id="avatarUpload" accept="image/*">
+                        <label for="avatarUpload" class="edit-icon">
+                          <i class="fas fa-camera"></i>
+                        </label>
+                      </div>
+                      <div class="online-status"></div>
+                    </div>
+                  </div>
+                  <div class="profile-meta">
+                    <h1 class="profile-name">{{ current_user.f_name }} {{ current_user.l_name }}</h1>
+                    <p class="profile-title">{{ current_user.role|capitalize }} Member</p>
+                    <div class="profile-stats">
+                      <div class="stat-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <span>Joined {{ current_user.date_joined.strftime('%b %Y') }}</span>
+                      </div>
+                      <div class="stat-item">
+                        <i class="fas fa-user-check"></i>
+                        <span>Verified Profile</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- <div class="profile-actions">
+                  <button class="btn-action btn-edit">
+                    <i class="fas fa-pen"></i> Edit Profile
+                  </button>
+                  <button class="btn-action btn-share">
+                    <i class="fas fa-share-alt"></i> Share
+                  </button>
+                </div> -->
+              </div>
+            </div>
+
+            <!-- Profile Edit Card -->
+            <div class="card profile-edit-card neumorphism">
+              <div class="card-header">
+                <h3><i class="fas fa-user-cog"></i> Personal Information</h3>
+                <div class="edit-toggle">
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="editToggle">
+                    <span class="slider round"></span>
+                  </label>
+                  <span>Edit Mode</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <form class="profile-form">
+                  <div class="form-grid">
+                    <!-- Column 1 -->
+                    <div class="form-column">
+                      <div class="form-group floating-label">
+                        <input type="text" id="firstName" value="{{ current_user.f_name }}" disabled>
+                        <label for="firstName">First Name</label>
+                        <div class="underline"></div>
+                      </div>
+                      
+                      <div class="form-group floating-label">
+                        <input type="email" id="email" value="{{ current_user.email }}" disabled>
+                        <label for="email">Email Address</label>
+                        <div class="underline"></div>
+                      </div>
+                      
+                      <!-- <div class="form-group floating-label">
+                        <input type="date" id="dob" value="{{ current_user.dob.strftime('%Y-%m-%d') if current_user.dob else '' }}" disabled>
+                        <label for="dob">Date of Birth</label>
+                        <div class="underline"></div>
+                      </div> -->
+                    </div>
+                    
+                    <!-- Column 2 -->
+                    <div class="form-column">
+                      <div class="form-group floating-label">
+                        <input type="text" id="lastName" value="{{ current_user.surname }}" disabled>
+                        <label for="lastName">Last Name</label>
+                        <div class="underline"></div>
+                      </div>
+                      
+                      <!-- <div class="form-group floating-label">
+                        <input type="tel" id="phone" value="{{ current_user.phone if current_user.phone else '' }}" disabled>
+                        <label for="phone">Phone Number</label>
+                        <div class="underline"></div>
+                      </div> -->
+                      
+                      <div class="form-group floating-label">
+                        <select id="gender">
+                          <option value="Male" {% if current_user.gender == 'Male' %}selected{% endif %}>Male</option>
+                          <option value="Female" {% if current_user.gender == 'Female' %}selected{% endif %}>Female</option>
+                          <option value="Other" {% if current_user.gender == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                        <label for="gender">Gender</label>
+                        <div class="underline"></div>
+                      </div>
+                    </div>
+                    
+                    <!-- Full Width Bio -->
+                    <!-- <div class="form-group full-width floating-label">
+                      <textarea id="bio" disabled>{{ current_user.bio if current_user.bio else 'Tell us about yourself...' }}</textarea>
+                      <label for="bio">About Me</label>
+                      <div class="underline"></div>
+                    </div> -->
+                  </div>
+                  
+                  <!-- Form Actions -->
+                  <div class="form-actions">
+                    <button type="button" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-save">Save Changes</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Security & Preferences Card -->
+            <div class="card security-card glassmorphism">
+              <div class="card-header">
+                <h3><i class="fas fa-shield-alt"></i> Security <!-- & Preferences --></h3>
+              </div>
+              <div class="card-body">
+                <div class="security-grid">
+                  <!-- Password Section -->
+                  <div class="security-item">
+                    <div class="security-icon">
+                      <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="security-content">
+                      <h4>Password</h4>
+                      <p>Last changed {{ current_user.password_changed.strftime('%b %d, %Y') if current_user.password_changed else 'Never' }}</p>
+                    </div>
+                    <button class="btn-security" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                      Change <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div>
+                  
+                  <!-- Two-Factor Auth -->
+                  <!-- <div class="security-item">
+                    <div class="security-icon">
+                      <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="security-content">
+                      <h4>Two-Factor Authentication</h4>
+                      <p>Add an extra layer of security</p>
+                    </div>
+                    <label class="switch">
+                      <input type="checkbox">
+                      <span class="slider round"></span>
+                    </label>
+                  </div> -->
+                  
+                  <!-- Notification Preferences -->
+                  <!-- <div class="security-item">
+                    <div class="security-icon">
+                      <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="security-content">
+                      <h4>Notification Preferences</h4>
+                      <p>Customize how you receive alerts</p>
+                    </div>
+                    <button class="btn-security">
+                      Manage <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div> -->
+                  
+                  <!-- Privacy Settings -->
+                  <!-- <div class="security-item">
+                    <div class="security-icon">
+                      <i class="fas fa-user-secret"></i>
+                    </div>
+                    <div class="security-content">
+                      <h4>Privacy Settings</h4>
+                      <p>Control your visibility</p>
+                    </div>
+                    <button class="btn-security">
+                      Settings <i class="fas fa-chevron-right"></i>
+                    </button>
+                  </div> -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Premium Password Modal -->
+        <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered bg-light">
+            <div class="modal-content glassmorphism">
+              <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-key"></i> Change Password</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form class="password-form">
+                  <div class="form-group floating-label">
+                    <input type="password" id="currentPassword" required>
+                    <label for="currentPassword">Current Password</label>
+                    <div class="underline"></div>
+                    <button type="button" class="toggle-password">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  
+                  <div class="form-group floating-label">
+                    <input type="password" id="newPassword" required>
+                    <label for="newPassword">New Password</label>
+                    <div class="underline"></div>
+                    <button type="button" class="toggle-password">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  
+                  <div class="form-group floating-label">
+                    <input type="password" id="confirmPassword" required>
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="underline"></div>
+                    <button type="button" class="toggle-password">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </div>
+                  
+                  <div class="password-strength">
+                    <div class="strength-meter">
+                      <div class="strength-bar"></div>
+                    </div>
+                    <div class="strength-labels">
+                      <span>Weak</span>
+                      <span>Medium</span>
+                      <span>Strong</span>
+                      <span>Excellent</span>
+                    </div>
+                  </div>
+                  
+                  <div class="password-requirements">
+                    <p>Password must contain:</p>
+                    <ul>
+                      <li class="req-length"><i class="fas fa-circle"></i> At least 8 characters</li>
+                      <li class="req-uppercase"><i class="fas fa-circle"></i> One uppercase letter</li>
+                      <li class="req-number"><i class="fas fa-circle"></i> One number</li>
+                      <li class="req-special"><i class="fas fa-circle"></i> One special character</li>
+                    </ul>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn-modal btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn-modal btn-confirm">Update Password</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- End of Premium Password Modal -->
+         <!-- footer -->
+         <div>
+          <footer
+            class="text-center"
+            style="position: absolute; bottom: -10px; width: 100%"
+          >
+            <p class="text-muted">
+              &copy; 2025 CervixVision. All rights reserved.
+            </p>
+          </footer>
+        </div>
+      </div>
+      <!-- End of right Content -->
+    </div>
+    <!-- End of container -->
+
+    <!-- JS Scripts and Bootstrapc Dependencies -->
+    <script>
+      const editToggle = document.getElementById("editToggle");
+const formInputs = document.querySelectorAll(
+  ".profile-form input, .profile-form select, .profile-form textarea"
+);
+
+if (editToggle) {
+  editToggle.addEventListener("change", function () {
+    formInputs.forEach((input) => {
+      input.disabled = !this.checked;
+    });
+
+    // Add animation to form elements when enabling edit mode
+    if (this.checked) {
+      document.querySelectorAll(".floating-label").forEach((label, index) => {
+        label.style.animation = `fadeInUp 0.4s ease ${index * 0.1}s forwards`;
+      });
+    }
+  });
+}
+
+// Avatar upload preview
+const avatarUpload = document.getElementById("avatarUpload");
+if (avatarUpload) {
+  avatarUpload.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        document.getElementById(
+          "avatarPreview"
+        ).style.backgroundImage = `url(${event.target.result})`;
+
+        // Add success animation
+        const avatarPreview = document.getElementById("avatarPreview");
+        avatarPreview.style.animation = "pulse 0.5s ease";
+        setTimeout(() => {
+          avatarPreview.style.animation = "";
+        }, 500);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+// Toggle password visibility
+document.querySelectorAll(".toggle-password").forEach((button) => {
+  button.addEventListener("click", function () {
+    const input = this.parentElement.querySelector("input");
+    const icon = this.querySelector("i");
+
+    if (input.type === "password") {
+      input.type = "text";
+      icon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+      input.type = "password";
+      icon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+
+    // Add animation
+    this.style.animation = "bounce 0.3s ease";
+    setTimeout(() => {
+      this.style.animation = "";
+    }, 300);
+  });
+});
+
+// Password strength meter
+const newPasswordInput = document.getElementById("newPassword");
+if (newPasswordInput) {
+  newPasswordInput.addEventListener("input", function () {
+    const password = this.value;
+    const strengthBar = document.querySelector(".strength-bar");
+    const strengthLabels = document.querySelectorAll(".strength-labels span");
+    const requirements = {
+      length: document.querySelector(".req-length"),
+      uppercase: document.querySelector(".req-uppercase"),
+      number: document.querySelector(".req-number"),
+      special: document.querySelector(".req-special"),
+    };
+
+    let strength = 0;
+
+    // Check password requirements
+    const hasLength = password.length >= 8;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+    // Update requirement indicators
+    if (requirements.length) {
+      requirements.length.querySelector("i").style.color = hasLength
+        ? "#00b894"
+        : "#ff4757";
+    }
+    if (requirements.uppercase) {
+      requirements.uppercase.querySelector("i").style.color = hasUppercase
+        ? "#00b894"
+        : "#ff4757";
+    }
+    if (requirements.number) {
+      requirements.number.querySelector("i").style.color = hasNumber
+        ? "#00b894"
+        : "#ff4757";
+    }
+    if (requirements.special) {
+      requirements.special.querySelector("i").style.color = hasSpecial
+        ? "#00b894"
+        : "#ff4757";
+    }
+
+    // Calculate strength
+    if (hasLength) strength += 25;
+    if (hasUppercase) strength += 25;
+    if (hasNumber) strength += 25;
+    if (hasSpecial) strength += 25;
+
+    // Update strength bar
+    if (strengthBar) {
+      strengthBar.style.width = strength + "%";
+
+      // Update strength color and label
+      if (strengthLabels) {
+        strengthLabels.forEach((label) => (label.style.color = ""));
+
+        if (strength < 50) {
+          strengthBar.style.backgroundColor = "#ff4757";
+          if (strengthLabels[0]) strengthLabels[0].style.color = "#ff4757";
+        } else if (strength < 75) {
+          strengthBar.style.backgroundColor = "#ffa502";
+          if (strengthLabels[1]) strengthLabels[1].style.color = "#ffa502";
+        } else if (strength < 100) {
+          strengthBar.style.backgroundColor = "#2ed573";
+          if (strengthLabels[2]) strengthLabels[2].style.color = "#2ed573";
+        } else {
+          strengthBar.style.backgroundColor = "#00b894";
+          if (strengthLabels[3]) strengthLabels[3].style.color = "#00b894";
+        }
+      }
+    }
+  });
+}
+
+// Add animations
+const animateOnScroll = () => {
+  const cards = document.querySelectorAll(".card");
+
+  cards.forEach((card, index) => {
+    const cardPosition = card.getBoundingClientRect().top;
+    const screenPosition = window.innerHeight / 1.2;
+
+    if (cardPosition < screenPosition) {
+      card.style.animation = `fadeInUp 0.6s ease ${index * 0.1}s forwards`;
+    }
+  });
+};
+
+window.addEventListener("scroll", animateOnScroll);
+animateOnScroll(); // Run once on page load
+
+// Keyframe animations
+const style = document.createElement("style");
+style.textContent = `
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+  
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+`;
+document.head.appendChild(style);
+
+// Handle form submission
+const profileForm = document.querySelector(".profile-form");
+if (profileForm) {
+  profileForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    // Here you would typically send the form data to your server
+    // For demonstration, we'll just show a success message
+    alert("Profile updated successfully!");
+
+    // Disable edit mode after submission
+    if (editToggle) {
+      editToggle.checked = false;
+      formInputs.forEach((input) => {
+        input.disabled = true;
+      });
+    }
+  });
+}
+
+// Handle password change form
+const passwordForm = document.querySelector(".password-form");
+if (passwordForm) {
+  passwordForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const currentPassword = document.getElementById("currentPassword").value;
+    const newPassword = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    // Basic validation
+    if (newPassword !== confirmPassword) {
+      alert("New password and confirmation do not match!");
+      return;
+    }
+
+    // Here you would typically send the password change request to your server
+    // For demonstration, we'll just show a success message
+    alert("Password changed successfully!");
+
+    // Close the modal
+    const modal = bootstrap.Modal.getInstance(
+      document.getElementById("passwordModal")
+    );
+    if (modal) {
+      modal.hide();
+    }
+
+    // Clear the form
+    passwordForm.reset();
+  });
+}
+
+    </script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+  </body>
+</html>

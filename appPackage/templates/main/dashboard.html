@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cervical Cancer Prediction System" />
+    <meta name="keywords" content="Cervical Cancer, Prediction, Healthcare" />
+    <meta name="author" content="Health System Team" />
+    <link
+      icons
+      rel="icon"
+      href="{{url_for('static', filename='hospital-healthcare-and-medical-svgrepo-com.svg')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/fontawesome.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/brands.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='css/solid.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='bootstrap/css/bootstrap.min.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='dashboard.css')}}"
+    />
+    <title>Dashboard</title>
+    <style>
+      /* Main container setup */
+      /*.container {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }*/
+
+      /* Sidebar styling - fixed with no scrollbar */
+      aside {
+        flex: 0 0 auto;
+        height: 100vh;
+        overflow-y: hidden; /* Changed from auto to hidden to remove scrollbar */
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      aside::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* Right content area */
+      .right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      /* Top navigation bar - remains fixed */
+      .top {
+        flex: 0 0 auto;
+        z-index: 100;
+      }
+
+      /* Main content area - scrolls independently */
+      .main-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.5rem 0;
+        margin-top: 0;
+      }
+
+      /* Card grid layout */
+      .insights {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding-bottom: 20px;
+      }
+
+      /* Card styling */
+      .card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .card-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .card-header h4 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #333;
+      }
+
+      .card-body {
+        padding: 0.5rem;
+        flex-grow: 1;
+      }
+
+      .card-footer {
+        padding: 10px 20px;
+        border-top: 1px solid #eee;
+        background-color: #f9f9f9;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+      }
+
+      /* Form elements */
+      .form-select {
+        width: auto;
+        display: inline-block;
+        padding: 0.25rem 1.5rem 0.25rem 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      /* Chart canvas */
+      canvas {
+        width: 100% !important;
+        height: 250px !important;
+      }
+
+      /* Stats grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(250px, 1fr));
+        gap: 15px;
+      }
+
+      .stat-item {
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+      }
+
+      .stat-item:nth-child(1)::before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        /*z-index: -1; Ensure the line is behind the content */
+        content: "";
+        width: 5px;
+        height: 100%;
+        border-radius: 8px;
+        /*background-color: #6c5ce7;*/
+        background-color: #0d6efd; /* Bootstrap primary color */
+      }
+
+      .stat-item:nth-child(2)::before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        /*z-index: -1; Ensure the line is behind the content */
+        content: "";
+        width: 5px;
+        height: 100%;
+        border-radius: 8px;
+        background-color: #e74c3c;
+      }
+      .stat-item:nth-child(3)::before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        /*z-index: -1; Ensure the line is behind the content */
+        content: "";
+        width: 5px;
+        height: 100%;
+        border-radius: 8px;
+        background-color: #f39c12;
+      }
+      .stat-item:nth-child(4)::before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        /*z-index: -1; Ensure the line is behind the content */
+        content: "";
+        width: 5px;
+        height: 100%;
+        border-radius: 8px;
+        background-color: #2980b9;
+      }
+      .stat-item:nth-child(5)::before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        /*z-index: -1; Ensure the line is behind the content */
+        content: "";
+        width: 5px;
+        height: 100%;
+        border-radius: 8px;
+        background-color: #1abc9c;
+      }
+      .stat-item:nth-child(6)::before {
+        position: absolute;
+        left: 0;
+        top: 0;
+        /*z-index: -1; Ensure the line is behind the content */
+        content: "";
+        width: 5px;
+        height: 100%;
+        border-radius: 8px;
+        background-color: #27ae60;
+      }
+
+      .stat-item:hover {
+        position: relative;
+        transform: translateY(-3px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+      }
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: white;
+      }
+
+      .stat-info h5 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+      }
+
+      .stat-info small {
+        color: #6c757d;
+        font-size: 0.8rem;
+      }
+
+      @media (max-width: 1200px) {
+        .stats-grid {
+          grid-template-columns: repeat(3, minmax(300px, 1fr));
+        }
+      }
+      @media (max-width: 1018px) {
+        .stats-grid {
+          grid-template-columns: repeat(1, minmax(300px, 1fr));
+        }
+      }
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .container {
+          flex-direction: column;
+        }
+
+        aside,
+        .right {
+          overflow-y: visible;
+        }
+        .main-content {
+          margin-top: 3.8rem;
+        }
+
+        .insights {
+          grid-template-columns: 1fr;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Custom scrollbar for main content */
+      .main-content::-webkit-scrollbar {
+        width: 8px;
+        display: none;
+      }
+
+      .main-content::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        display: none;
+      }
+
+      .main-content::-webkit-scrollbar-thumb {
+        background: rgba(108, 92, 231, 0.5);
+        border-radius: 4px;
+      }
+
+      .main-content::-webkit-scrollbar-thumb:hover {
+        background: rgba(108, 92, 231, 0.7);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- sidebar content -->
+      <aside>
+        <div class="top">
+          <a href="{{url_for('main.home')}}"
+            ><div class="logo">
+              <img
+                src="{{url_for('static', filename='CervixVision.png')}}"
+                alt="icon"
+              />
+              <h2 class="head">CervixVision</h2>
+            </div></a
+          >
+          <div class="close-btn">
+            <i class="fa-solid fa-xmark"></i>
+          </div>
+        </div>
+        <div class="sidebar">
+          {% if current_user.is_authenticated %} {% if current_user.role in
+          ['admin', 'super admin', 'doctor']%}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          {%if current_user.role in ['admin', 'super admin']%}
+          <a href="{{url_for('user_management.admin')}}">
+            <i class="fas fa-user-shield"></i>
+            <h3>Admin</h3>
+          </a>
+          {%endif%}
+
+          <a href="{{url_for('main.dashboard')}}">
+            <i class="fas fa-tachometer-alt"></i>
+            <h3>Dashboard</h3>
+          </a>
+          {% if current_user.role == "doctor" %}
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+          {%endif%}
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>Results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          {% if current_user.role in ['admin', 'super admin'] %}
+          <a href="{{url_for('main.reports')}}">
+            <i class="fas fa-file-alt"></i>
+            <h3>Reports</h3>
+          </a>
+          {% endif %}
+          <!--<a href="#">
+                    <i class="fas fa-question-circle"></i>
+                    <h3>Help</h3>
+                  </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% else %}
+          <a href="{{url_for('main.home')}}">
+            <i class="fas fa-home"></i>
+            <h3>Home</h3>
+          </a>
+          <a href="{{url_for('main.prediction')}}">
+            <i class="fas fa-chart-line"></i>
+            <h3>Predict</h3>
+          </a>
+
+          <a href="{{url_for('main.result_generation')}}">
+            <i class="fas fa-check-circle"></i>
+            <h3>results</h3>
+          </a>
+          <a href="{{url_for('auth.user_profile')}}">
+            <i class="fas fa-user"></i>
+            <h3>Profile</h3>
+          </a>
+          <!--<a href="#">
+                        <i class="fas fa-question-circle"></i>
+                        <h3>Help</h3>
+                      </a>-->
+          <a href="{{url_for('auth.logout')}}">
+            <i class="fas fa-sign-out-alt"></i>
+            <h3>Logout</h3>
+          </a>
+          {% endif %} {% else %}
+          <a href="{{url_for('auth.login')}}"> Login </a>
+          {% endif %}
+        </div>
+      </aside>
+
+      <!-- right section content -->
+      <div class="right">
+        <div class="top">
+          <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+          </div>
+          <!--user profile photo-->
+          <div class="profile">
+            <div class="profile-info">
+              <h2>Hello, <b>{{current_user.f_name | capitalize}}</b></h2>
+            </div>
+            <div class="profile-pic">
+              <a href="{{ url_for('auth.user_profile') }}">
+                <!--<img
+                  src="{{ url_for('static', filename='profile_pictures/' + current_user.profile_pic) if current_user.profile_pic else url_for('static', filename='profile_pictures/default-premium.png') }}"
+                  alt="Profile Picture"
+                />-->
+                <img
+                  src="{{url_for('static', filename='/profile_pictures/user.png')}}"
+                  alt="pic"
+                />
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- content for model's prediction trends over time -->
+        <div class="main-content">
+          <div class="insights">
+            <!-- Daily Predictions Card -->
+            <div class="card">
+              <div class="card-header">
+                <h4>Daily Predictions</h4>
+                <select id="daily-filter" class="form-select form-select-sm">
+                  <option value="7">Last 7 Days</option>
+                  <option value="14">Last 14 Days</option>
+                  <option value="30">Last 30 Days</option>
+                </select>
+              </div>
+              <div class="card-body">
+                <canvas id="dailyChart"></canvas>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">Updated 1 min ago</small>
+              </div>
+            </div>
+
+            <!-- Monthly Predictions Card -->
+            <div class="card">
+              <div class="card-header">
+                <h4>Monthly Predictions</h4>
+                <select id="monthly-filter" class="form-select form-select-sm">
+                  <option value="6">Last 6 Months</option>
+                  <option value="12">Last 12 Months</option>
+                </select>
+              </div>
+              <div class="card-body">
+                <canvas id="monthlyChart"></canvas>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">Updated 5 mins ago</small>
+              </div>
+            </div>
+
+            <!-- Age Distribution Card -->
+            <div class="card">
+              <div class="card-header">
+                <h4>Patient Age Distribution</h4>
+                <select id="age-filter" class="form-select form-select-sm">
+                  <option value="all">All Cases</option>
+                  <option value="Dyskeratotic">Dyskeratotic Cases</option>
+                  <option value="Koilocytotic">Koilocytotic Cases</option>
+                  <option value="Metaplastic">Metaplastic Cases</option>
+                  <option value="Parabasal">Parabasal Cases</option>
+                  <option value="Superficial-Intermediate">
+                    Superficial-Intermediate Cases
+                  </option>
+                </select>
+              </div>
+              <div class="card-body">
+                <canvas id="ageChart"></canvas>
+              </div>
+              <div class="card-footer">
+                <small class="text-muted">Updated 10 mins ago</small>
+              </div>
+            </div>
+
+            <!-- Stats Overview Card -->
+            <div class="stats-overview-card">
+              <div class="card-header">
+                <h4>Prediction Statistics</h4>
+              </div>
+              <div class="card-body">
+                <div class="stats-grid">
+                  <!-- Total Patients -->
+                  <div class="stat-item">
+                    <div class="stat-icon bg-primary text-white">
+                      <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                      <h5 id="total-patients"></h5>
+                      <small>Total Tests</small>
+                    </div>
+                  </div>
+
+                  <!-- Dyskeratotic -->
+                  <div class="stat-item">
+                    <div
+                      class="stat-icon"
+                      style="background-color: #e74c3c; color: #fff"
+                    >
+                      <i class="fas fa-virus"></i>
+                    </div>
+                    <div class="stat-info">
+                      <h5 id="dyskeratotic-predictions"></h5>
+                      <small>Dyskeratotic Predictions</small>
+                    </div>
+                  </div>
+
+                  <!-- Koilocytotic -->
+                  <div class="stat-item">
+                    <div
+                      class="stat-icon"
+                      style="background-color: #f39c12; color: #fff"
+                    >
+                      <i class="fas fa-dna"></i>
+                    </div>
+                    <div class="stat-info">
+                      <h5 id="koilocytotic-predictions"></h5>
+                      <small>Koilocytotic Predictions</small>
+                    </div>
+                  </div>
+
+                  <!-- Metaplastic -->
+                  <div class="stat-item">
+                    <div
+                      class="stat-icon"
+                      style="background-color: #2980b9; color: #fff"
+                    >
+                      <i class="fas fa-random"></i>
+                    </div>
+                    <div class="stat-info">
+                      <h5 id="metaplastic-predictions"></h5>
+                      <small>Metaplastic Predictions</small>
+                    </div>
+                  </div>
+
+                  <!-- Parabasal -->
+                  <div class="stat-item">
+                    <div
+                      class="stat-icon"
+                      style="background-color: #1abc9c; color: #fff"
+                    >
+                      <i class="fas fa-cube"></i>
+                    </div>
+                    <div class="stat-info">
+                      <h5 id="parabasal-predictions"></h5>
+                      <small>Parabasal Predictions</small>
+                    </div>
+                  </div>
+
+                  <!-- Superficial-Intermediate -->
+                  <div class="stat-item">
+                    <div
+                      class="stat-icon"
+                      style="background-color: #27ae60; color: #fff"
+                    >
+                      <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="stat-info">
+                      <h5 id="superficial-predictions"></h5>
+                      <small>Superficial-Intermediate Predictions</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <footer class="text-center py-2 mt-3 w-100">
+              <p class="text-muted mb-0">
+                &copy; 2025 CervixVision. All rights reserved.
+              </p>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{url_for('static', filename='bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{url_for('static', filename='script.js')}}"></script>
+    <script src="{{url_for('static', filename='dashboardAPIs.js')}}"></script>
+  </body>
+</html>

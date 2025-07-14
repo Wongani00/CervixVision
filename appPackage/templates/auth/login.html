@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Cervical Cancer Prediction System" />
+    <meta name="keywords" content="Cervical Cancer, Prediction, Healthcare" />
+    <meta name="author" content="Health System Team" />
+    <link
+      icons
+      rel="icon"
+      href="{{url_for('static', filename='hospital-healthcare-and-medical-svgrepo-com.svg')}}"
+    />
+    <link rel="icon" type="image/icon" href="img/favicon.svg" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="{{url_for('static', filename='forms.css')}}" />
+    <title>{{title}}</title>
+  </head>
+  <body>
+    <div class="form-container" id="form-cont">
+      <div
+        class="relative mx-auto w-full max-w-md bg-white px-6 pt-10 pb-8 mt-4 shadow-xl ring-1 ring-gray-900/5 sm:rounded-xl sm:px-10"
+      >
+        <div class="w-full">
+          <div class="text-center">
+            <h1 class="text-3xl font-semibold text-gray-900">Welcome Back</h1>
+          </div>
+          <div class="mt-8">
+            <form action="" onsubmit="handleLoginSubmit(event)">
+              <div class="relative mt-6">
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  placeholder="Email Address"
+                  class="peer mt-1 w-full border-b-2 border-gray-300 px-0 py-1 placeholder:text-transparent focus:border-gray-500 focus:outline-none"
+                  autocomplete="off"
+                />
+                <label
+                  for="email"
+                  class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800"
+                  >Email Address</label
+                >
+              </div>
+              <div class="relative mt-6">
+                <input
+                  type="password"
+                  name="password"
+                  id="password"
+                  placeholder="Password"
+                  autocomplete="off"
+                  class="peer mt-1 w-full border-b-2 border-gray-300 px-0 py-1 placeholder:text-transparent focus:border-gray-500 focus:outline-none"
+                />
+                <label
+                  for="password"
+                  class="pointer-events-none absolute top-0 left-0 origin-left -translate-y-1/2 transform text-sm text-gray-800 opacity-75 transition-all duration-100 ease-in-out peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-0 peer-focus:pl-0 peer-focus:text-sm peer-focus:text-gray-800"
+                  >Password</label
+                >
+              </div>
+
+              <!-- Forgot Password Link -->
+              <div class="text-right mt-2">
+                <a
+                  href="{{ url_for('auth.reset_password') }}"
+                  class="text-sm text-blue-600 hover:underline focus:outline-none"
+                >
+                  Forgot Password?
+                </a>
+              </div>
+
+              <div class="my-6">
+                <button
+                  type="submit"
+                  class="w-full rounded-md bg-blue-600 px-3 py-2 text-white focus:bg-gray-600 focus:outline-none"
+                >
+                  Sign in
+                </button>
+              </div>
+              <!-- success alert -->
+              <div
+                class="alert alert-success"
+                id="login-success"
+                style="display: none"
+              >
+                <strong>Success!</strong> Loading...
+              </div>
+              <!-- failed login alert -->
+              <div
+                class="alert alert-danger alert-dismissible fade show"
+                id="failed-login"
+                style="display: none"
+              >
+                <button type="button" class="close" data-dismiss="alert">
+                  &times;
+                </button>
+                <strong>Oops!</strong> The email, or password you entered is
+                incorrect. Please try again
+              </div>
+
+              <p class="text-center text-sm text-gray-500">
+                Don&#x27;t have an account yet?
+                <a
+                  href="{{ url_for('auth.signup') }}"
+                  class="font-semibold text-gray-600 hover:underline focus:text-gray-800 focus:outline-none"
+                  >Sign up</a
+                >.
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+  </body>
+</html>
