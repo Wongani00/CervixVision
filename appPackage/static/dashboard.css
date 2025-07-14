@@ -1,0 +1,360 @@
+:root {
+  --success-color: #41f1b6;
+  --primary-color: #7380ec;
+  --danger-color: #ff7782;
+  --warning-color: #ffbb55;
+  --color-white: #fff;
+  --info-dark-color: #a3a0a0;
+  --info-light-color: #ddd;
+  --color-dark: #363949;
+  --color-light: rgba(132, 139, 200, 0.18);
+  --primary-color-variant: #111e88;
+  --dark-color-variant: #677483;
+  --background-color: #f6f6f9;
+
+  --border-radius1: 0.4rem;
+  --border-radius2: 0.8rem;
+  --border-radius3: 1.2rem;
+  --card-border-radius: 2rem;
+  --padding-card: 1.8rem;
+  --padding: 1.2rem;
+  --box-shadow: 0 2rem 3rem var(--color-light);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  border: 0;
+  appearance: none;
+  text-decoration: none;
+  list-style: none;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  background-color: #f2f2f2;
+}
+
+h1 {
+  font-size: 1.87rem;
+}
+h2 {
+  font-size: 1.3rem;
+}
+h3 {
+  font-size: 1.2rem;
+}
+h4 {
+  font-size: 0.9rem;
+}
+h5 {
+  font-size: 0.75rem;
+}
+
+img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--dark-color-variant);
+  text-decoration: none;
+}
+.profile-pic {
+  width: 2em;
+  height: 2em;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.container {
+  display: grid;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  grid-template-columns: 14rem auto;
+  gap: 0.8rem;
+  margin-left: -0.4rem;
+  padding-left: 0.4rem;
+  margin-right: -0.4rem;
+  padding-right: 0.4rem;
+}
+
+/* ===== styling the sidebar ===== */
+aside {
+  height: 100vh;
+  position: relative;
+  background-color: white;
+}
+
+aside .top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--dark-color-variant);
+  background-color: white;
+  margin-top: 0.7rem;
+  padding: 0.5rem 0.6rem;
+}
+
+aside .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+aside .top .logo img {
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+}
+
+aside .top .logo h2 {
+  /* color: #41e2f1; */
+  color: #2563eb;
+  cursor: pointer;
+}
+
+aside .top .close-btn {
+  font-size: 1.4em;
+  transition: transform 0.2s ease;
+  display: none;
+}
+
+aside .top .close-btn:hover {
+  cursor: pointer;
+  /* transform: scale(1.3); */
+}
+
+aside .sidebar {
+  top: 0.8rem;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  position: relative;
+  height: 90vh;
+}
+
+aside .sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  position: relative;
+  height: 3.3rem;
+  color: var(--color-dark);
+  transition: all 300ms ease;
+  padding: 0 1.3rem;
+}
+
+aside .sidebar a:last-child {
+  position: absolute;
+  width: 100%;
+  bottom: 2rem;
+}
+
+aside .sidebar a i {
+  font-size: 1.5rem;
+  transition: all 300ms ease;
+}
+
+aside .sidebar a:hover {
+  background-color: var(--color-light);
+  color: var(--primary-color-variant);
+}
+
+aside .sidebar a:hover i {
+  transform: translateX(-5px);
+}
+
+aside .sidebar a.active {
+  background-color: var(--color-light);
+  color: var(--primary-color-variant);
+}
+
+aside .sidebar a.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 6px;
+  height: 100%;
+  background-color: var(--primary-color-variant);
+}
+
+aside .sidebar a.active:hover i {
+  transform: translateX(0);
+}
+
+/* ===== styling the right section ===== */
+.right {
+  margin-top: 0;
+}
+.right .top {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  /* gap: 2em; */
+  background: var(--color-white);
+  padding: 0.5rem;
+  border-radius: var(--border-radius1);
+  box-shadow: var(--shadow-light);
+  margin-bottom: 1rem;
+}
+.right .top .menu-btn i {
+  font-size: 1.3em;
+  /* transition: transform 0.2s ease; */
+  display: none;
+}
+
+.right .top .menu-btn i:hover {
+  color: var(--primary-color-variant);
+  cursor: pointer;
+  /* transform: scale(1.3); */
+}
+.right .top .profile {
+  display: flex;
+  text-align: right;
+  gap: 0.7em;
+  align-items: center;
+}
+
+.right .top .profile .profile-pic:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+  box-shadow: var(--shadow-medium);
+}
+
+/* ====== MEDIA QUERRIES ====== */
+
+/* ======= Tablet Responsiveness (768px to 1200px) ======= */
+@media screen and (min-width: 769px) and (max-width: 1200px) {
+  .container {
+    grid-template-columns: 3rem auto;
+    width: 100%;
+    gap: 0.8rem;
+    display: grid;
+    grid-auto-flow: row;
+  }
+
+  /* Sidebar Adjustments */
+  aside {
+    left: 0;
+    visibility: visible;
+    opacity: 1;
+    transition: all 0.3s ease-in-out;
+  }
+
+  aside .logo h2,
+  aside .sidebar a h3 {
+    display: none;
+  }
+
+  aside .sidebar a {
+    justify-content: center;
+    padding: 0 0.5rem;
+  }
+
+  aside .sidebar a i {
+    margin: 0 auto;
+  }
+
+  /* Right Section Adjustments */
+  .right {
+    margin-top: 0.5em;
+  }
+
+  .right .top {
+    gap: 1em;
+  }
+}
+
+/* ===== FOR MOBILE DEVICES ===== */
+@media screen and (max-width: 768px) {
+  .container {
+    width: 100%;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+  }
+
+  aside {
+    position: fixed;
+    left: -100%;
+    background-color: var(--color-white);
+    width: 16rem;
+    box-shadow: 1rem 3rem 4rem var(--color-light);
+    z-index: 8;
+    display: none;
+    padding-right: var(--padding-card);
+    height: 100vh;
+    transition: left 0.3s ease-in-out;
+  }
+
+  /* opening the sidebar */
+  .open {
+    left: 0;
+    display: block;
+  }
+
+  aside .logo {
+    margin-left: 0.5rem;
+  }
+
+  aside .logo h2 {
+    display: inline;
+  }
+
+  aside .top .close-btn {
+    display: inline-block;
+  }
+
+  aside .sidebar a h3 {
+    display: inline;
+  }
+
+  aside .sidebar a {
+    width: 100%;
+  }
+
+  aside .sidebar a:last-child {
+    position: absolute;
+    margin-bottom: 1.7rem;
+  }
+
+  .right {
+    margin-top: 0;
+    width: 96%;
+    margin: 0 auto 4rem;
+  }
+
+  .right .top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem;
+    background-color: white;
+    /* box-shadow: 0 1rem 1rem #e8ebee; */
+    width: 100%;
+    max-width: 100vw;
+    z-index: 3;
+  }
+
+  .right .top .menu-btn i {
+    display: inline-block;
+    font-size: 2rem;
+    background-color: transparent;
+    color: var(--color-dark);
+  }
+  #hero-section {
+    margin-top: 3.9rem;
+  }
+}
