@@ -12,3 +12,4 @@ app = create_app()
 #     app.run(debug=True)
 
 # web: gunicorn run:app
+gunicorn -w 2 -k gthread -t 300 run:app
