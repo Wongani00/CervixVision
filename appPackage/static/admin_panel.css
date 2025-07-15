@@ -549,7 +549,7 @@ aside .sidebar a.active:hover i {
     margin-top: 5.1rem;
     padding: 0 0.5rem;
     height: calc(100vh - 5.1rem);
-    overflow-y: auto;
+    /* overflow-y: auto; */
   }
 
   /* Mobile Metrics */
@@ -579,24 +579,24 @@ aside .sidebar a.active:hover i {
   /* Mobile Table - Only table scrolls, not page */
   .table-responsive {
     max-height: 60vh;
-    overflow-y: auto;
-    overflow-x: auto;
+    /* overflow-y: auto; */
+    overflow-x: scroll;
     border-radius: var(--border-radius1);
-    /* box-shadow: var(--shadow-medium); */
+    box-shadow: var(--shadow-medium);
     margin: 1rem 0;
   }
 
-  #users-table {
+  /* #users-table {
     min-width: 600px;
     font-size: 0.85rem;
-  }
+  } */
 
   #users-table thead th {
     padding: 0.55rem 0.5rem;
     font-size: 0.75rem;
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    /* position: sticky; */
+    /* top: 0;
+    z-index: 10; */
   }
 
   #users-table td {

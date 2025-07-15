@@ -32,6 +32,11 @@ from werkzeug.utils import secure_filename
 from tensorflow.keras.models import load_model  # type: ignore
 from tensorflow.keras.preprocessing.image import img_to_array, load_img  # type: ignore
 import numpy as np
+import tensorflow as tf
+
+tf.config.optimizer.set_jit(
+    True
+)  # Enable XLA (Accelerated Linear Algebra) for faster computation
 
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
@@ -566,10 +571,10 @@ def feedback():
 
 
 # ==== user profile route ====
-@main.route("/profile")
-@login_required
-def user_profile():
-    return render_template("main/profile.html")
+# @main.route("/profile")
+# @login_required
+# def user_profile():
+#     return render_template("main/profile.html")
 
 
 # reports route
