@@ -335,20 +335,13 @@
             <i class="fas fa-check-circle"></i>
             <h3>Results</h3>
           </a>
-          <a href="{{url_for('auth.user_profile')}}">
-            <i class="fas fa-user"></i>
-            <h3>Profile</h3>
-          </a>
           {% if current_user.role in ['admin', 'super admin'] %}
           <a href="{{url_for('main.reports')}}">
             <i class="fas fa-file-alt"></i>
             <h3>Reports</h3>
           </a>
           {% endif %}
-          <!--<a href="#">
-                    <i class="fas fa-question-circle"></i>
-                    <h3>Help</h3>
-                  </a>-->
+
           <a href="{{url_for('auth.logout')}}">
             <i class="fas fa-sign-out-alt"></i>
             <h3>Logout</h3>
@@ -367,14 +360,6 @@
             <i class="fas fa-check-circle"></i>
             <h3>results</h3>
           </a>
-          <a href="{{url_for('auth.user_profile')}}">
-            <i class="fas fa-user"></i>
-            <h3>Profile</h3>
-          </a>
-          <!--<a href="#">
-                        <i class="fas fa-question-circle"></i>
-                        <h3>Help</h3>
-                      </a>-->
           <a href="{{url_for('auth.logout')}}">
             <i class="fas fa-sign-out-alt"></i>
             <h3>Logout</h3>
@@ -400,25 +385,10 @@
               </h2>
             </div>
             <div class="profile-pic">
-              <a href="{{url_for('main.user_profile')}}" class="profile-link">
-                {% if current_user.profile_pic %}
-                <img
-                  src="{{url_for('static', filename='profile_pics/' + current_user.profile_pic)}}"
-                  alt="Profile Picture"
-                />
-                {% else %}
-                <a href="{{ url_for('auth.user_profile') }}">
-                  <!--<img
-                    src="{{ url_for('static', filename='profile_pictures/' + current_user.profile_pic) if current_user.profile_pic else url_for('static', filename='profile_pictures/default-premium.png') }}"
-                    alt="Profile Picture"
-                  />-->
-                  <img
-                    src="{{url_for('static', filename='/profile_pictures/user.png')}}"
-                    alt="pic"
-                  />
-                </a>
-                {% endif %}
-              </a>
+              <img
+                src="{{url_for('static', filename='/profile_pictures/user.png')}}"
+                alt="pic"
+              />
             </div>
           </div>
         </div>

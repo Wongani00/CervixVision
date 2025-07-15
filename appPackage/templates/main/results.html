@@ -122,10 +122,6 @@
             <i class="fas fa-check-circle"></i>
             <h3>Results</h3>
           </a>
-          <a href="{{url_for('auth.user_profile')}}">
-            <i class="fas fa-user"></i>
-            <h3>Profile</h3>
-          </a>
           {% if current_user.role in ['admin', 'super admin'] %}
           <a href="{{url_for('main.reports')}}">
             <i class="fas fa-file-alt"></i>
@@ -150,10 +146,6 @@
             <i class="fas fa-check-circle"></i>
             <h3>results</h3>
           </a>
-          <a href="{{url_for('auth.user_profile')}}">
-            <i class="fas fa-user"></i>
-            <h3>Profile</h3>
-          </a>
           <a href="{{url_for('auth.logout')}}">
             <i class="fas fa-sign-out-alt"></i>
             <h3>Logout</h3>
@@ -177,12 +169,10 @@
               <h2>Hello, <b>{{current_user.f_name | capitalize}}</b></h2>
             </div>
             <div class="profile-pic">
-              <a href="{{ url_for('auth.user_profile') }}">
-                <img
-                  src="{{url_for('static', filename='/profile_pictures/user.png')}}"
-                  alt="pic"
-                />
-              </a>
+              <img
+                src="{{url_for('static', filename='/profile_pictures/user.png')}}"
+                alt="pic"
+              />
             </div>
           </div>
         </div>
@@ -243,11 +233,14 @@
                   <thead class="table-light">
                     <tr>
                       <th>Date</th>
-                      <th>Class</th>
+                      <th>Name</th>
+                      <th>Predicted Class</th>
                       <th>Confidence</th>
                       <th>OOD Status</th>
                       <th>True Label</th>
+                      {% if current_user.role == "doctor" %}
                       <th>Actions</th>
+                      {% endif %}
                     </tr>
                   </thead>
                   <tbody>
@@ -533,6 +526,7 @@
               const row = document.createElement("tr");
               row.innerHTML = `
                 <td>${new Date(pred.date).toLocaleDateString()}</td>
+                <td>${pred.first_name} ${pred.surname}</td>
                 <td>${pred.predicted_class}</td>
                 <td>${(pred.confidence * 100).toFixed(2)}%</td>
                 <td class="${
@@ -545,6 +539,7 @@
                     ${pred.ood_status || "In Distribution"}
                 </td>
                 <td>${pred.true_label || "Not Set"}</td>
+                {% if current_user.role == "doctor" %}
                 <td>
                   <div class="action-buttons">
                     <button class="btn btn-info btn-sm text-white" onclick="openReviewModal(${
@@ -561,6 +556,7 @@
                     </button>
                   </div>
                 </td>
+                {% endif %}
               `;
               tbody.appendChild(row);
             });
