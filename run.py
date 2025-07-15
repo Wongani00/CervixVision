@@ -8,7 +8,7 @@ app = create_app()
 #     db.create_all()
 #     print("All tables recreated.")
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
 
 # web: gunicorn run:app
