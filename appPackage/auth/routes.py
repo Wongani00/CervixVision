@@ -340,7 +340,7 @@ def logout():
 
 
 # user profile information route
-@auth.route("/user-profile")
-@login_required
-def user_profile():
-    return render_template("auth/profile.html")
+# @auth.route("/user-profile")
+# @login_required
+# def user_profile():
+#     return render_template("auth/profile.html")
