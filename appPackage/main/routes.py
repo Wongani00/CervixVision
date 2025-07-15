@@ -45,7 +45,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 main = Blueprint("main", __name__)
 
 # Load ensemble model
-model = load_model("Model/xception_cervical_cancer.keras")
+model = load_model("Model/xception_cervical_cancer.keras", compile=False)
 # classes in the model
 labels = [
     "Dyskeratotic",
