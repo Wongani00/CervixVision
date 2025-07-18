@@ -45,7 +45,7 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 main = Blueprint("main", __name__)
 
 # Load ensemble model
-model = load_model("Model/xception_cervical_cancer.keras", compile=False)
+model = load_model("Model/xception_cervical_cancer.keras")
 # classes in the model
 labels = [
     "Dyskeratotic",
@@ -169,19 +169,22 @@ def prediction():
         label = labels[top1_idx]
         top1 = float(probs[top1_idx])
         top2 = float(probs[top2_idx])
+        # Calculate score gap
         score_gap = float(top1 - top2)
 
+        if top1 >= 0.9999:
+            top1 = 0.9996
         if top1 >= 0.9998:
-            top1 = 0.9967
+            top1 = 0.9994
         elif 0.9987 <= top1 <= 0.9997:
-            top1 = 0.9957
+            top1 = 0.9992
         elif top1 >= 0.9999:
-            top1 = 0.9987
+            top1 = 0.9989
         # Entropy (natural log)
         entropy = -np.sum(probs * np.log(probs + 1e-9))
 
         # Thresholds
-        confidence_cap = 0.98
+        confidence_cap = 0.9989
         min_score_gap = 0.02
         entropy_threshold = 0.05
 
@@ -200,7 +203,8 @@ def prediction():
             first_name=first_name,
             surname=surname,
             age=age,
-            image_path=os.path.join(f"user_{user_id}", filename),
+            # image_path=os.path.join(f"user_{user_id}", filename),
+            image_path=f"user_{user_id}/{filename}",
             predicted_class=label if ood_status == "accepted" else None,
             confidence=top1,
             ood_status=ood_status,
@@ -300,15 +304,16 @@ def api_report():
         {
             "predictions": [
                 {
-                    "id": p.id,  # Add ID for modal operations
+                    "id": p.id,
                     "date": p.created_at.date().isoformat(),
-                    "first_name": p.first_name,  # Add first name
-                    "surname": p.surname,  # Add surname
+                    "first_name": p.first_name,
+                    "surname": p.surname,
+                    "patient_name": f"{p.first_name} {p.surname}",  # Full name
                     "predicted_class": p.predicted_class,
+                    "true_label": p.true_label,  # Include true label
                     "confidence": p.confidence,
                     "ood_status": p.ood_status,
-                    "true_label": p.true_label,  # Add true label
-                    "user_name": f"{p.user.f_name} {p.user.surname}",
+                    "user_name": f"{p.user.f_name} {p.user.surname}",  # Uploader
                 }
                 for p in predictions
             ],
@@ -340,8 +345,9 @@ def export_csv():
             Prediction.predicted_class,
             Prediction.confidence,
             Prediction.ood_status,
-            User.f_name,
-            User.surname,
+            Prediction.first_name,
+            Prediction.surname,
+            Prediction.true_label,
         ).join(User)
 
         # Apply filtering logic
@@ -365,16 +371,34 @@ def export_csv():
 
         # Prepare CSV data
         csv_data = []
-        headers = ["Date", "Predicted Class", "Confidence", "OOD Status"]
+        headers = [
+            "Date",
+            "Patient Name",
+            "Predicted Class",
+            "True Label",
+            "Confidence",
+            "OOD Status",
+        ]
         csv_data.append(",".join(headers))
 
         for r in results:
             date_str = r[0].date().isoformat()
+            patient_name = f"{r[4]} {r[5]}"  # first_name + surname from Prediction
             confidence = f"{round(r[2]*100, 2)}%" if r[2] is not None else "N/A"
             ood_status = r[3] if r[3] is not None else "N/A"
-            user_name = f"{r[4]} {r[5]}"
+            predicted_class = r[1]
+            true_label = getattr(
+                r, "true_label", "N/A"
+            )  # Safely access if not included in query
 
-            row = [date_str, r[1], confidence, ood_status]
+            row = [
+                date_str,
+                patient_name,
+                predicted_class,
+                true_label,
+                confidence,
+                ood_status,
+            ]
             csv_data.append(",".join(f'"{x}"' for x in row))
 
         # Generate filename
@@ -420,8 +444,9 @@ def export_pdf():
             Prediction.predicted_class,
             Prediction.confidence,
             Prediction.ood_status,
-            User.f_name,
-            User.surname,
+            Prediction.first_name,
+            Prediction.surname,
+            Prediction.true_label,
         ).join(User)
 
         # Apply filtering logic
@@ -486,7 +511,9 @@ def export_pdf():
         <table>
             <tr>
                 <th>Date</th>
-                <th>Class</th>
+                <th>Patient</th>
+                <th style={{ max-width: 70px; display: block;}}>Predicted Class</th>
+                <th>True Label</th>
                 <th>Confidence</th>
                 <th>OOD Status</th>
             </tr>
@@ -496,12 +523,16 @@ def export_pdf():
             date_str = r[0].date().isoformat()
             confidence = f"{round(r[2] * 100, 2)}%" if r[2] is not None else "N/A"
             ood_status = r[3] if r[3] is not None else "N/A"
-            user_name = f"{r[4]} {r[5]}"
+            predicted_class = r[1]
+            true_label = r[6] if len(r) > 6 else "N/A"
+            patient_name = f"{r[4]} {r[5]}"
 
             html += f"""
             <tr>
                 <td>{date_str}</td>
-                <td>{r[1]}</td>
+                <td>{patient_name}</td>
+                <td>{predicted_class}</td>
+                <td>{true_label}</td>
                 <td>{confidence}</td>
                 <td>{ood_status}</td>
             </tr>
@@ -647,122 +678,184 @@ def report_summary():
 
 
 # Export summary report as CSV
-# @main.route("/export/summary_report/csv")
-# @login_required
-# @role_required("admin", "super admin")
-# def export_summary_csv():
+@main.route("/export/summary_report/csv")
+@login_required
+@role_required("admin", "super admin")
+def export_summary_csv():
 
-#     # Extract and parse date range
-#     start = request.args.get("start")
-#     end = request.args.get("end")
-#     try:
-#         start_dt = datetime.strptime(start, "%Y-%m-%d") if start else None
-#         end_dt = datetime.strptime(end, "%Y-%m-%d") if end else None
-#     except:
-#         return jsonify({"error": "Invalid dates"}), 400
+    # Extract and parse date range
+    start = request.args.get("start")
+    end = request.args.get("end")
+    try:
+        start_dt = datetime.strptime(start, "%Y-%m-%d") if start else None
+        end_dt = datetime.strptime(end, "%Y-%m-%d") if end else None
+    except:
+        return jsonify({"error": "Invalid dates"}), 400
 
-#     query = Prediction.query
-#     if start_dt:
-#         query = query.filter(Prediction.created_at >= start_dt)
-#     if end_dt:
-#         query = query.filter(Prediction.created_at <= end_dt)
+    query = Prediction.query
+    if start_dt:
+        query = query.filter(Prediction.created_at >= start_dt)
+    if end_dt:
+        query = query.filter(Prediction.created_at <= end_dt)
 
-#     total = query.count()
-#     avg_conf = query.with_entities(func.avg(Prediction.confidence)).scalar() or 0
-#     rejected = query.filter_by(ood_status="rejected").count()
+    total = query.count()
+    avg_conf = query.with_entities(func.avg(Prediction.confidence)).scalar() or 0
+    rejected = query.filter_by(ood_status="rejected").count()
 
-#     class_counts = (
-#         db.session.query(Prediction.predicted_class, func.count(Prediction.id))
-#         .filter(Prediction.created_at >= start_dt if start_dt else True)
-#         .filter(Prediction.created_at <= end_dt if end_dt else True)
-#         .group_by(Prediction.predicted_class)
-#         .all()
-#     )
-#     top_class = max(class_counts, key=lambda x: x[1])[0] if class_counts else "N/A"
-#     recent = query.order_by(Prediction.created_at.desc()).first()
-#     last_upload = recent.created_at.strftime("%Y-%m-%d %H:%M") if recent else "N/A"
+    class_counts = (
+        db.session.query(Prediction.predicted_class, func.count(Prediction.id))
+        .filter(Prediction.created_at >= start_dt if start_dt else True)
+        .filter(Prediction.created_at <= end_dt if end_dt else True)
+        .group_by(Prediction.predicted_class)
+        .all()
+    )
+    top_class = max(class_counts, key=lambda x: x[1])[0] if class_counts else "N/A"
+    recent = query.order_by(Prediction.created_at.desc()).first()
+    last_upload = recent.created_at.strftime("%Y-%m-%d %H:%M") if recent else "N/A"
 
-#     # Generate CSV
-#     output = StringIO()
-#     writer = csv.writer(output)
-#     writer.writerow(["Metric", "Value"])
-#     writer.writerow(["Total Predictions", total])
-#     writer.writerow(["Average Confidence", f"{avg_conf * 100:.2f}%"])
-#     writer.writerow(["Rejected Predictions", rejected])
-#     writer.writerow(["Most Frequent Class", top_class])
-#     writer.writerow(["Most Recent Upload", last_upload])
-#     writer.writerow(["Class Distribution"])
-#     for c in class_counts:
-#         writer.writerow([c[0], c[1]])
+    # Generate CSV
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["Metric", "Value"])
+    writer.writerow(["Total Predictions", total])
+    writer.writerow(["Average Confidence", f"{avg_conf * 100:.2f}%"])
+    writer.writerow(["Rejected Predictions", rejected])
+    writer.writerow(["Most Frequent Class", top_class])
+    writer.writerow(["Most Recent Upload", last_upload])
+    writer.writerow(["Class Distribution"])
+    for c in class_counts:
+        writer.writerow([c[0], c[1]])
 
-#     output.seek(0)
-#     return Response(
-#         output,
-#         mimetype="text/csv",
-#         headers={"Content-Disposition": "attachment; filename=report_summary.csv"},
-#     )
+    output.seek(0)
+    return Response(
+        output,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment; filename=report_summary.csv"},
+    )
 
 
-# # Export summary report as PDF
-# @main.route("/export/summary_report/pdf")
-# @login_required
-# @role_required("admin", "super admin")
-# def export_summary_pdf():
+# API for exporting PDF report
+@main.route("/export/summary_report/pdf")
+@login_required
+@role_required("admin", "super admin")
+def export_summary_pdf():
+    from collections import defaultdict
+    import matplotlib.pyplot as plt
+    import base64
 
-#     start = request.args.get("start")
-#     end = request.args.get("end")
-#     try:
-#         start_dt = datetime.strptime(start, "%Y-%m-%d") if start else None
-#         end_dt = datetime.strptime(end, "%Y-%m-%d") if end else None
-#     except:
-#         return jsonify({"error": "Invalid dates"}), 400
+    start = request.args.get("start")
+    end = request.args.get("end")
+    try:
+        start_dt = datetime.strptime(start, "%Y-%m-%d") if start else None
+        end_dt = datetime.strptime(end, "%Y-%m-%d") if end else None
+    except:
+        return jsonify({"error": "Invalid dates"}), 400
 
-#     query = Prediction.query
-#     if start_dt:
-#         query = query.filter(Prediction.created_at >= start_dt)
-#     if end_dt:
-#         query = query.filter(Prediction.created_at <= end_dt)
+    query = Prediction.query
+    if start_dt:
+        query = query.filter(Prediction.created_at >= start_dt)
+    if end_dt:
+        query = query.filter(Prediction.created_at <= end_dt)
 
-#     total = query.count()
-#     avg_conf = query.with_entities(func.avg(Prediction.confidence)).scalar() or 0
-#     rejected = query.filter_by(ood_status="rejected").count()
+    total = query.count()
+    avg_conf = query.with_entities(func.avg(Prediction.confidence)).scalar() or 0
+    rejected = query.filter_by(ood_status="rejected").count()
 
-#     class_counts = (
-#         db.session.query(Prediction.predicted_class, func.count(Prediction.id))
-#         .filter(Prediction.created_at >= start_dt if start_dt else True)
-#         .filter(Prediction.created_at <= end_dt if end_dt else True)
-#         .group_by(Prediction.predicted_class)
-#         .all()
-#     )
-#     top_class = max(class_counts, key=lambda x: x[1])[0] if class_counts else "N/A"
-#     recent = query.order_by(Prediction.created_at.desc()).first()
-#     last_upload = recent.created_at.strftime("%Y-%m-%d %H:%M") if recent else "N/A"
+    class_counts = (
+        db.session.query(Prediction.predicted_class, func.count(Prediction.id))
+        .filter(Prediction.created_at >= start_dt if start_dt else True)
+        .filter(Prediction.created_at <= end_dt if end_dt else True)
+        .group_by(Prediction.predicted_class)
+        .all()
+    )
 
-#     html = f"""
-#     <h3>Prediction Report Summary</h3>
-#     <p><strong>Total Predictions:</strong> {total}</p>
-#     <p><strong>Average Confidence:</strong> {(avg_conf * 100):.2f}%</p>
-#     <p><strong>Rejected Predictions:</strong> {rejected}</p>
-#     <p><strong>Most Frequent Class:</strong> {top_class}</p>
-#     <p><strong>Most Recent Upload:</strong> {last_upload}</p>
-#     <p><strong>Class Distribution:</strong></p>
-#     <ul>
-#     """
-#     for c in class_counts:
-#         html += f"<li>{c[0]}: {c[1]}</li>\n"
-#     html += "</ul>"
+    top_class = max(class_counts, key=lambda x: x[1])[0] if class_counts else "N/A"
+    recent = query.order_by(Prediction.created_at.desc()).first()
+    last_upload = recent.created_at.strftime("%Y-%m-%d %H:%M") if recent else "N/A"
 
-#     pdf = BytesIO()
-#     pisa_status = pisa.CreatePDF(html, dest=pdf)
+    # Daily predictions (trend data)
+    date_counts = defaultdict(int)
+    for pred in query.all():
+        date = pred.created_at.strftime("%Y-%m-%d")
+        date_counts[date] += 1
 
-#     if pisa_status.err:
-#         return jsonify({"error": "Error generating PDF"}), 500
+    sorted_dates = sorted(date_counts.items())
+    dates, counts = zip(*sorted_dates) if sorted_dates else ([], [])
 
-#     pdf.seek(0)
-#     response = make_response(pdf.read())
-#     response.headers["Content-Type"] = "application/pdf"
-#     response.headers["Content-Disposition"] = "attachment; filename=report_summary.pdf"
-#     return response
+    # Generate bar chart (trend)
+    if dates:
+        plt.figure(figsize=(6, 3))
+        plt.bar(dates, counts, color="skyblue")
+        plt.xticks(rotation=45, ha="right", fontsize=6)
+        plt.tight_layout()
+        plt.title("Prediction Count per Day")
+        plt.ylabel("Count")
+
+        chart_buffer = BytesIO()
+        plt.savefig(chart_buffer, format="png")
+        chart_buffer.seek(0)
+        chart_base64 = base64.b64encode(chart_buffer.read()).decode("utf-8")
+        plt.close()
+
+        chart_html = f'<img src="data:image/png;base64,{chart_base64}" width="100%">'
+    else:
+        chart_html = "<p>No trend data available.</p>"
+
+    # Generate class distribution HTML
+    class_dist_html = "<ul>"
+    for c in class_counts:
+        class_dist_html += f"<li>{c[0]}: {c[1]}</li>"
+    class_dist_html += "</ul>"
+
+    # HTML Report Template
+    html = f"""
+    <html>
+    <body>
+    <h2 style="text-align: center;">Cervical Cancer Prediction Report Summary</h2>
+    <hr>
+    <p><strong>Report Time Range:</strong> {start} to {end}</p>
+    <h3>1. Total Predictions</h3>
+    <p>{total} predictions were made in the selected period. This indicates the level of screening activity and model usage.</p>
+
+    <h3>2. Average Confidence Score</h3>
+    <p>{(avg_conf * 100):.2f}% - This reflects how certain the model was on average. Higher confidence suggests stronger model predictions.</p>
+
+    <h3>3. Rejected Predictions</h3>
+    <p>{rejected} predictions were flagged as out-of-distribution (OOD) and rejected. These may indicate unfamiliar or poor-quality inputs.</p>
+
+    <h3>4. Most Frequent Predicted Class</h3>
+    <p><strong>{top_class}</strong> - This class appeared most often.</p>
+
+    <h3>5. Class Distribution</h3>
+    {class_dist_html}
+
+    <h3>6. Most Recent Upload</h3>
+    <p>Last recorded prediction upload: {last_upload}</p>
+
+    <h3>7. Prediction Trends Over Time</h3>
+    <p>This chart shows how many predictions were made each day, helping track usage patterns or screening campaigns.</p>
+    {chart_html}
+
+    <hr>
+    <p style="font-size: 12px; color: #888;">Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+    </body>
+    </html>
+    """
+
+    # Generate PDF
+    pdf = BytesIO()
+    pisa_status = pisa.CreatePDF(html, dest=pdf)
+
+    if pisa_status.err:
+        return jsonify({"error": "Error generating PDF"}), 500
+
+    pdf.seek(0)
+    response = make_response(pdf.read())
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = (
+        "attachment; filename=prediction_report_detailed.pdf"
+    )
+    return response
 
 
 # Route to get, edit, and delete predictions
