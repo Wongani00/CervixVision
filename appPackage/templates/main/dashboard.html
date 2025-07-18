@@ -478,86 +478,98 @@
               </div>
               <div class="card-body">
                 <div class="stats-grid">
-                  <!-- Total Patients -->
-                  <div class="stat-item">
-                    <div class="stat-icon bg-primary text-white">
-                      <i class="fas fa-users"></i>
+                  <a href="{{url_for('main.result_generation')}}">
+                    <!-- Total Patients -->
+                    <div class="stat-item">
+                      <div class="stat-icon bg-primary text-white">
+                        <i class="fas fa-users"></i>
+                      </div>
+                      <div class="stat-info">
+                        <h5 id="total-patients"></h5>
+                        <small>Total Tests</small>
+                      </div>
                     </div>
-                    <div class="stat-info">
-                      <h5 id="total-patients"></h5>
-                      <small>Total Tests</small>
-                    </div>
-                  </div>
+                  </a>
 
-                  <!-- Dyskeratotic -->
-                  <div class="stat-item">
-                    <div
-                      class="stat-icon"
-                      style="background-color: #e74c3c; color: #fff"
-                    >
-                      <i class="fas fa-virus"></i>
+                  <a href="{{url_for('main.result_generation')}}">
+                    <!-- Dyskeratotic -->
+                    <div class="stat-item">
+                      <div
+                        class="stat-icon"
+                        style="background-color: #e74c3c; color: #fff"
+                      >
+                        <i class="fas fa-virus"></i>
+                      </div>
+                      <div class="stat-info">
+                        <h5 id="dyskeratotic-predictions"></h5>
+                        <small>Dyskeratotic Tests</small>
+                      </div>
                     </div>
-                    <div class="stat-info">
-                      <h5 id="dyskeratotic-predictions"></h5>
-                      <small>Dyskeratotic Predictions</small>
-                    </div>
-                  </div>
+                  </a>
 
-                  <!-- Koilocytotic -->
-                  <div class="stat-item">
-                    <div
-                      class="stat-icon"
-                      style="background-color: #f39c12; color: #fff"
-                    >
-                      <i class="fas fa-dna"></i>
+                  <a href="{{url_for('main.result_generation')}}">
+                    <!-- Koilocytotic -->
+                    <div class="stat-item">
+                      <div
+                        class="stat-icon"
+                        style="background-color: #f39c12; color: #fff"
+                      >
+                        <i class="fas fa-dna"></i>
+                      </div>
+                      <div class="stat-info">
+                        <h5 id="koilocytotic-predictions"></h5>
+                        <small>Koilocytotic Tests</small>
+                      </div>
                     </div>
-                    <div class="stat-info">
-                      <h5 id="koilocytotic-predictions"></h5>
-                      <small>Koilocytotic Predictions</small>
-                    </div>
-                  </div>
+                  </a>
 
-                  <!-- Metaplastic -->
-                  <div class="stat-item">
-                    <div
-                      class="stat-icon"
-                      style="background-color: #2980b9; color: #fff"
-                    >
-                      <i class="fas fa-random"></i>
+                  <a href="{{url_for('main.result_generation')}}">
+                    <!-- Metaplastic -->
+                    <div class="stat-item">
+                      <div
+                        class="stat-icon"
+                        style="background-color: #2980b9; color: #fff"
+                      >
+                        <i class="fas fa-random"></i>
+                      </div>
+                      <div class="stat-info">
+                        <h5 id="metaplastic-predictions"></h5>
+                        <small>Metaplastic Tests</small>
+                      </div>
                     </div>
-                    <div class="stat-info">
-                      <h5 id="metaplastic-predictions"></h5>
-                      <small>Metaplastic Predictions</small>
-                    </div>
-                  </div>
+                  </a>
 
-                  <!-- Parabasal -->
-                  <div class="stat-item">
-                    <div
-                      class="stat-icon"
-                      style="background-color: #1abc9c; color: #fff"
-                    >
-                      <i class="fas fa-cube"></i>
+                  <a href="{{url_for('main.result_generation')}}">
+                    <!-- Parabasal -->
+                    <div class="stat-item">
+                      <div
+                        class="stat-icon"
+                        style="background-color: #1abc9c; color: #fff"
+                      >
+                        <i class="fas fa-cube"></i>
+                      </div>
+                      <div class="stat-info">
+                        <h5 id="parabasal-predictions"></h5>
+                        <small>Parabasal Tests</small>
+                      </div>
                     </div>
-                    <div class="stat-info">
-                      <h5 id="parabasal-predictions"></h5>
-                      <small>Parabasal Predictions</small>
-                    </div>
-                  </div>
+                  </a>
 
-                  <!-- Superficial-Intermediate -->
-                  <div class="stat-item">
-                    <div
-                      class="stat-icon"
-                      style="background-color: #27ae60; color: #fff"
-                    >
-                      <i class="fas fa-layer-group"></i>
+                  <a href="{{url_for('main.result_generation')}}">
+                    <!-- Superficial-Intermediate -->
+                    <div class="stat-item">
+                      <div
+                        class="stat-icon"
+                        style="background-color: #27ae60; color: #fff"
+                      >
+                        <i class="fas fa-layer-group"></i>
+                      </div>
+                      <div class="stat-info">
+                        <h5 id="superficial-predictions"></h5>
+                        <small>Superficial-Intermediate Tests</small>
+                      </div>
                     </div>
-                    <div class="stat-info">
-                      <h5 id="superficial-predictions"></h5>
-                      <small>Superficial-Intermediate Predictions</small>
-                    </div>
-                  </div>
+                  </a>
                 </div>
               </div>
             </div>

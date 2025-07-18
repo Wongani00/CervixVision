@@ -283,14 +283,14 @@
             </div>
           </div>
           <!-- Export Buttons -->
-          <!-- <div class="mb-3 d-flex justify-content-end gap-2">
-            <button class="btn btn-outline-success" onclick="exportCSV()">
-              Export CSV
+          <div class="mb-3 d-flex justify-content-end gap-2">
+            <!-- <button class="btn btn-outline-success" onclick="exportCSV()">
+              Export CSV  -->
             </button>
             <button class="btn btn-outline-danger" onclick="exportPDF()">
               Export PDF
             </button>
-          </div> -->
+          </div>
           <!-- Summary Report Table -->
           <div class="card shadow-sm mb-4">
             <div class="card-header bg-white">
@@ -379,6 +379,16 @@
         if (start) params.append("start", start);
         if (end) params.append("end", end);
         return params.toString();
+      }
+
+      function exportPDF() {
+        const { start, end } = getDateRangeFromFilter();
+        const params = new URLSearchParams();
+        if (start) params.append("start", start);
+        if (end) params.append("end", end);
+    
+        // Redirect to the export URL with query parameters
+        window.location.href = `/export/summary_report/pdf?${params.toString()}`;
       }
 
       function loadSummary() {

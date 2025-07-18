@@ -393,9 +393,7 @@
                         border: 1px solid #dee2e6;
                         border-radius: 8px;
                       "
-                    >
-                      <span class="text-muted">No image available</span>
-                    </div>
+                    ></div>
                   </div>
                 </div>
               </div>
@@ -542,7 +540,7 @@
                 {% if current_user.role == "doctor" %}
                 <td>
                   <div class="action-buttons">
-                    <button class="btn btn-info btn-sm text-white" onclick="openReviewModal(${
+                    <button class="btn btn-primary btn-sm text-white" onclick="openReviewModal(${
                       pred.id
                     })" title="Review">
                       <i class="fas fa-eye"></i>
@@ -604,7 +602,7 @@
               document.getElementById("image-placeholder");
 
             if (data.image_path) {
-              modalImage.src = `/static/uploads/${data.image_path}`;
+              modalImage.src = `${data.image_path}`;
               modalImage.style.display = "block";
               imagePlaceholder.style.display = "none";
             } else {
