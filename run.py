@@ -9,8 +9,4 @@ app = create_app()
 #     print("All tables recreated.")
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))  # fallback to 10000
-    app.run(host="0.0.0.0", port=port)
-
-
-# web: gunicorn run:app
+    app.run(debug=True)
