@@ -90,7 +90,7 @@ def signup():
                 new_user = User(
                     f_name=data.get("f_name"),
                     surname=data.get("surname"),
-                    email=data.get("email"),
+                    email=data.get("email").strip().lower(),
                     password_hash=data.get("password"),
                     role=data.get("role"),
                     gender=data.get("gender"),

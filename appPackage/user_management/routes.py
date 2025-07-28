@@ -146,7 +146,7 @@ def edit_user(user_id):
     firstname = request.form.get("firstname")
     surname = request.form.get("surname")
     role = request.form.get("role")
-    email = request.form.get("email")
+    email = request.form.get("email").strip().lower()
 
     try:
         # Preventing downgrading super admin by non-super admins

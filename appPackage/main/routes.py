@@ -44,8 +44,14 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 main = Blueprint("main", __name__)
 
-# Load ensemble model
-model = load_model("Model/xception_cervical_cancer.keras")
+# Load TFLite model once
+interpreter = tf.lite.Interpreter(
+    model_path="Model/xception_cervical_cancer_model.tflite"
+)
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
 # classes in the model
 labels = [
     "Dyskeratotic",
@@ -91,7 +97,6 @@ def dashboard():
 @login_required
 @role_required("doctor", "nurse")
 def prediction():
-
     if request.method == "POST":
         image_file = request.files.get("image")
         user_id = current_user.id
@@ -100,7 +105,6 @@ def prediction():
         date_of_birth = request.form.get("userDOB")
         dateOfPrediction = request.form.get("predictionDate")
 
-        # Validate required fields
         if not all(
             [user_id, first_name, surname, date_of_birth, dateOfPrediction, image_file]
         ):
@@ -126,15 +130,7 @@ def prediction():
         except Exception:
             return jsonify({"error": "Invalid date format"}), 400
 
-        # Validate image file and saving it to tye file system for later use
         try:
-            # Ensure allowed extension
-            # ext = os.path.splitext(image_file.filename)[1].lower()
-            # allowed_exts = [".jpg", ".jpeg", ".png"]
-            # if ext not in allowed_exts:
-            #     return jsonify({"error": "Unsupported image format"}), 400
-
-            # Generate a unique and safe filename
             filename = f"{uuid.uuid4().hex}.jpg"
             user_folder = os.path.join(
                 current_app.root_path, "static", "uploads", f"user_{user_id}"
@@ -142,53 +138,48 @@ def prediction():
             os.makedirs(user_folder, exist_ok=True)
             filepath = os.path.join(user_folder, secure_filename(filename))
 
-            # Open the uploaded image
-            image = Image.open(image_file).convert("RGB")  # Converts even PNG to RGB
-            image = image.resize((224, 224))  # Resize to model's required dimensions
-
-            # Save the image as JPEG
+            image = Image.open(image_file).convert("RGB")
+            image = image.resize((224, 224))
             image.save(filepath, format="JPEG", quality=85, optimize=True)
-
         except Exception as e:
             print("Image processing error:", e)
             return jsonify({"error": "Failed to process image"}), 400
 
-        # Prepare image for prediction (only for model input)
+        # Prepare image for TFLite model
         image_for_model = Image.open(filepath).convert("RGB")
-        image_for_model = img_to_array(image_for_model) / 255.0
-        image_for_model = np.expand_dims(image_for_model, axis=0)
+        image_for_model = image_for_model.resize((224, 224))
+        image_array = img_to_array(image_for_model) / 255.0
+        image_array = np.expand_dims(image_array.astype(np.float32), axis=0)
 
-        # Model prediction
-        preds = model.predict(image_for_model)
-        probs = preds[0]
+        interpreter.set_tensor(input_details[0]["index"], image_array)
+        interpreter.invoke()
+        output_data = interpreter.get_tensor(output_details[0]["index"])
+        probs = output_data[0]
 
-        # Top-1 and Top-2
         sorted_indices = np.argsort(probs)[::-1]
-        top1_idx = sorted_indices[0]
-        top2_idx = sorted_indices[1]
+        top1_idx = int(sorted_indices[0])
+        top2_idx = int(sorted_indices[1])
         label = labels[top1_idx]
         top1 = float(probs[top1_idx])
         top2 = float(probs[top2_idx])
-        # Calculate score gap
         score_gap = float(top1 - top2)
 
+        # Soft confidence squashing
         if top1 >= 0.9999:
-            top1 = 0.9996
-        if top1 >= 0.9998:
+            top1 = 0.9997
+        elif top1 >= 0.9998:
             top1 = 0.9994
-        elif 0.9987 <= top1 <= 0.9997:
-            top1 = 0.9992
-        elif top1 >= 0.9999:
+        elif 0.9995 <= top1 <= 0.9997:
+            top1 = 0.9993
+        elif top1 >= 0.99994:
             top1 = 0.9989
-        # Entropy (natural log)
-        entropy = -np.sum(probs * np.log(probs + 1e-9))
 
-        # Thresholds
-        confidence_cap = 0.9989
+        entropy = float(-np.sum(probs * np.log(probs + 1e-9)))
+
+        confidence_cap = 0.9994
         min_score_gap = 0.02
         entropy_threshold = 0.05
 
-        # OOD Check
         if (
             top1 >= confidence_cap
             and score_gap >= min_score_gap
@@ -198,12 +189,10 @@ def prediction():
         else:
             ood_status = "rejected"
 
-        # Save to DB
         prediction = Prediction(
             first_name=first_name,
             surname=surname,
             age=age,
-            # image_path=os.path.join(f"user_{user_id}", filename),
             image_path=f"user_{user_id}/{filename}",
             predicted_class=label if ood_status == "accepted" else None,
             confidence=top1,
@@ -220,9 +209,9 @@ def prediction():
                     {
                         "error": "⚠️ Prediction is not reliable.",
                         "ood_status": ood_status,
-                        "entropy": float(round(entropy, 4)),
-                        "confidence": float(round(top1, 4)),
-                        "score_gap": float(round(score_gap, 4)),
+                        "entropy": round(entropy, 4),
+                        "confidence": round(top1, 4),
+                        "score_gap": round(score_gap, 4),
                         "recommendation": "Please ensure the image is a clear cervical screening image.",
                     }
                 ),
@@ -235,9 +224,9 @@ def prediction():
                 "first_name": first_name,
                 "surname": surname,
                 "age": age,
-                "confidence": float(round(top1, 4)),
-                "entropy": float(round(entropy, 4)),
-                "score_gap": float(round(score_gap, 4)),
+                "confidence": round(top1, 4),
+                "entropy": round(entropy, 4),
+                "score_gap": round(score_gap, 4),
                 "ood_status": ood_status,
             }
         )
